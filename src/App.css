@@ -1,0 +1,52 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
+  background-color: rgb(24, 24, 24);
+}
+
+#play-menu {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translateY(-50%) translateX(-50%);
+  padding: 20px 30px;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 5px;
+  text-align: center;
+}
+
+#play-button {
+  margin-top: 10px;
+}
+
+.hidden {
+  visibility: hidden;
+  display: none;
+}
+
+.title {
+  font-family: 'Junior Bold';
+  color: rgb(67, 67, 67);
+}
+
+.radio-form {
+  display: flex;
+}
+
+.inline-label {
+  margin-left: 2px;
+  margin-right: 10px;
+}
+
+.modal {
+  padding: 20px 30px;
+  background-color: white;
+  align-items: center;
+  border-radius: 5px;
+  text-align: center;
+}
