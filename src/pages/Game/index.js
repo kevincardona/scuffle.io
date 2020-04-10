@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
 import {socket, joinRoom} from '../../util/api';
 import Constants from '../../constants';
-import './game.css';
 import Loader from '../../assets/loader.svg';
 import Chat from '../../components/Chat';
+import './game.css';
 
 export default class Game extends Component {
   constructor(props) {

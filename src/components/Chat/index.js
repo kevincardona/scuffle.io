@@ -31,9 +31,17 @@ export default class Chat extends Component {
   }
 
   send = (event) => {
-    event.preventDefault();
-    sendMessage(socket, this.state.input)
+    if (event)
+      event.preventDefault();
+    if (this.state.input)
+      sendMessage(socket, this.state.input)
     this.setState({input: ""})
+  }
+
+  onKeyPress = event => {
+    if (event.key === 'Enter') {
+      this.send()
+    }
   }
 
   render() {
@@ -54,7 +62,7 @@ export default class Chat extends Component {
           }
         </ul>
         <div className="input-group">
-          <input type="text" className="form-control" placeholder="Message" value={input} onChange={(e) => this.updateInput(e)}/>
+          <input type="text" className="form-control" placeholder="Message" onKeyPress={this.onKeyPress} value={input} onChange={(e) => this.updateInput(e)}/>
           <div className="input-group-append">
             <button className="btn btn-primary input-group-btn" onClick={this.send}>Send</button>
           </div>

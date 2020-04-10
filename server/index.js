@@ -7,10 +7,10 @@ const app = express();
 const port = process.env.PORT || 3001;
 
 if (process.env.NODE_ENV === 'development') {
-  app.use(express.static(path.join(__dirname, 'client/build')));
-  app.get('*', (req, res) => {  res.sendFile(path.join(__dirname+'../public/index.html'));})
+  app.use(express.static(path.join(__dirname, '../build')));
 } else {
-  app.use(express.static('dist'));
+  console.log("Starting production server...")
+  app.use(express.static(path.join(__dirname, '../build')));
 }
 
 const server = app.listen(port, () => {

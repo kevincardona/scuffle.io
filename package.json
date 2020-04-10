@@ -19,8 +19,8 @@
   "scripts": {
     "server": "nodemon server/index.js",
     "client": "yarn start --prefix client",
-    "dev": "concurrently \"yarn run server\" \"yarn run client\"",
-    "start": "react-scripts start",
+    "dev": "concurrently \"react-scripts start\" \"yarn run client\"",
+    "start": "node server/index.js",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
