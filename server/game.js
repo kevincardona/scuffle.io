@@ -1,8 +1,9 @@
-const Constants = require('../public/constants');
+const Constants = require('../src/constants');
 const Room = require('./room');
 
 class Game {
-  constructor() {
+  constructor(io) {
+    this.io = io
     this.players = {};
     this.rooms = {};
     this.lastUpdateTime = Date.now();
@@ -11,28 +12,30 @@ class Game {
 
   getPlayerRoom(id) {
     if (this.players[id])
-      return this.rooms[this.players[id].roomCode]
+      return this.rooms[this.players[id].room]
   }
 
-  createRoom(socket, nickname, roomCode) {
-    if (!roomCode || !nickname) {
-      return socket.emit(Constants.MSG_TYPES.DISCONNECT)
-    }
-    this.rooms[roomCode] = new Room(roomCode)
-    this.addPlayer(socket, nickname, roomCode)
-  }
-
-  addPlayer(socket, nickname, roomCode) {
-    this.players[socket.id] = {
-      socket: socket,
-      roomCode: roomCode
-    }
-    if (this.rooms[roomCode]) {
-      this.rooms[roomCode].addPlayer(socket, nickname)
+  addPlayer(socket, nickname, room) {
+    if (this.rooms[room]) {
+      this.rooms[room].addPlayer(socket, nickname)
     } else {
-      socket.emit(Constants.MSG_TYPES.LEAVE_ROOM, {message: "No room found with given roomcode!"})
-      this.removePlayer(socket)
+      this.rooms[room] = new Room(this.io, room)
+      this.rooms[room].addPlayer(socket, nickname, room)
     }
+    socket.join(room)
+    this.players[socket.id] = {
+      nickname: nickname,
+      socket: socket,
+      room: room
+    }
+  }
+
+  handleMessage(socket, message) {
+    const data = {
+      player: this.players[socket.id].nickname,
+      message: message
+    }
+    this.io.in(this.players[socket.id].room).emit(Constants.MSG_TYPES.SEND_MESSAGE, data)
   }
 
   removePlayer(socket) {

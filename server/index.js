@@ -1,7 +1,7 @@
 const express = require('express');
 const socketio = require('socket.io');
 const path = require('path');
-const Constants = require('../public/constants');
+const Constants = require('../src/constants');
 const Game = require('./game');
 const app = express();
 const port = process.env.PORT || 3001;
@@ -21,18 +21,19 @@ const io = socketio(server);
 io.on('connection', socket => {
   console.log('Player connected!', socket.id);
   socket.on(Constants.MSG_TYPES.JOIN_ROOM, joinRoom);
-  socket.on(Constants.MSG_TYPES.CREATE_ROOM, createRoom);
+  socket.on(Constants.MSG_TYPES.SEND_MESSAGE, handleMessage)
   socket.on(Constants.MSG_TYPES.DISCONNECT, onDisconnect);
 });
 
-const game = new Game();
-
-function createRoom(data) {
-  game.createRoom(this, data.nickname, data.roomCode)
-}
+const game = new Game(io);
 
 function joinRoom(data) {
-  game.addPlayer(this, data.nickname, data.roomCode);
+  game.addPlayer(this, data.nickname, data.room);
+}
+
+function handleMessage(message) {
+  console.log(`Handling message: ${message}`)
+  game.handleMessage(this, message);
 }
 
 function onDisconnect() {
