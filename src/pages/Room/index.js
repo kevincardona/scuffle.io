@@ -22,7 +22,6 @@ export default class Room extends Component {
   }
 
   updateRoom = (data) => {
-    console.warn(data)
     this.setState({loading: false, players: data.players, unflipped: data.unflipped.length, flipped: data.flipped})
   }
 
@@ -43,7 +42,8 @@ export default class Room extends Component {
             [...Array(Constants.GAME.TILE_COUNT)].map((e, i) => {
               if (i < flipped.length)
                 return <Tile letter={flipped[i]}/>
-              return <Tile/>
+              if (i < flipped.length + 1)
+                return <Tile/>
             })
           }
         </div>

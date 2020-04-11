@@ -24,5 +24,10 @@
   justify-content: center;
   flex-direction: row;
   flex-wrap: wrap;
+  overflow: auto;
   width: 100%;
+}
+
+#letters--center::-webkit-scrollbar {
+  display: none;
 }

@@ -14,7 +14,9 @@ const Menu = (props) => {
 
   return (
     <div id="play-menu">
-      <h1 className="title">Scuffle</h1>
+      <div className="title">
+        <h1>Scuffle</h1>
+      </div>
       <input 
         type="text" 
         className="input-group-text mb-2" 

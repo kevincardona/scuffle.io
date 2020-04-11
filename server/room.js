@@ -6,6 +6,7 @@ class Room {
     this.room = room;
     this.players = new Object();
     this.playerOrder = [];
+    this.flipped = new Array(Constants.GAME.TILE_COUNT)
     this.currentPlayer = null;
     this.io = io
     setInterval(this.update.bind(this), 500);
@@ -21,6 +22,10 @@ class Room {
         this.unflipped.push(letter)
     })
     this.unflipped = helpers.shuffle(this.unflipped)
+    this.letterIndex = {}
+    this.unflipped.forEach((letter, index) => {
+
+    })
   }
 
   getRoomData() {
@@ -41,24 +46,72 @@ class Room {
     this.io.in(this.room).emit(Constants.MSG_TYPES.GAME_UPDATE, currentPlayer)    
   }
 
-  flipTile(player) {
-    const newLetter = this.unflipped.pop()
+  flipTile(data, index) {
+    let newLetter = null
+    if (index) {
+      newLetter = this.unflipped[index]
+      if (newLetter) {
+        this.unflipped.splice(index, 1)
+      }
+    } else {
+      newLetter = this.unflipped.pop()
+    }
+    if (!newLetter)
+      return
     this.flipped.push(newLetter);
-    this.sendServerMessage(`${player} flipped the letter ${newLetter}`)
+    this.sendServerMessage(`${data.player} flipped the letter ${newLetter}`)
   }
-  
-  handleCommand(data) {
-    switch(data.message) {
-      case 'flip':
-        this.flipTile(data.player)
+
+  checkCenter(letters) {
+    let foundLetters = {}
+    for (const letter of letters) {
+      let found = false
+      for(let i = 0; i < this.flipped.length; i++) {
+        const flippedLetter = this.flipped[i];
+        if (letter == flippedLetter && found[i] == undefined) {
+          foundLetters[i] = i;
+          found = true;
+          break
+        }
+      }
+      if (!found) {
+        return false
+      }
+    }
+    return foundLetters
+  }
+
+  takeFromCenter(indices) {
+    this.flipped = this.flipped.filter((_, index) => {
+      return indices[index] == undefined
+    })
+    console.log(this.flipped)
+  }
+
+  claimWord(data, word) {
+    let indices = this.checkCenter([...word.toUpperCase()]);
+    if (indices !== false) {
+      this.takeFromCenter(indices)
+    } else {
+      this.sendServerMessage('NOT FOUND FOOL')
     }
   }
 
   handlePlayerMessage(data) {
-    if (Constants.CHAT_MSG_TYPES.COMMANDS[data.message]) {
-      this.handleCommand(data)
+    const commands = data.message.split(' ')
+    if (Constants.CHAT_MSG_TYPES.COMMANDS[commands[0]]) {
+      this.handleCommand(data, commands)
     } else {
       this.sendMessage(data)
+    }
+  }
+  
+  handleCommand(data, commands) {
+    switch(commands[0]) {
+      case 'flip':
+        return this.flipTile(data, parseInt(commands.slice(1)))
+      case 'claim':
+        return this.claimWord(data, commands[1])
     }
   }
 
@@ -88,13 +141,6 @@ class Room {
   removePlayer(socket) {
     this.sendServerMessage(`Player: ${this.players[socket.id].nickname} has left the room!`)
     delete this.players[socket.id]
-  }
-
-  addWord(word) {
-    this.words.push(word)
-  }
-
-  removeWord(word) {
   }
 
   serializeForUpdate() {

@@ -19,7 +19,7 @@
   },
   "scripts": {
     "server": "nodemon server/index.js",
-    "client": "yarn start --prefix client",
+    "client": "nodemon server/index.js",
     "dev": "concurrently \"react-scripts start\" \"yarn run client\"",
     "start": "node server/index.js",
     "build": "react-scripts build",

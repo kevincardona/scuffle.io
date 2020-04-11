@@ -12,7 +12,8 @@ module.exports = Object.freeze({
       SERVER_MESSAGE: 'server_message',
       PLAYER_MESSAGE: 'player_message',
       COMMANDS: {
-        'flip': 'flip'
+        'flip': 'flip',
+        'claim': 'claim'
       }
     },
     GAME: {
