@@ -41,6 +41,39 @@ class Room {
     this.io.in(this.room).emit(Constants.MSG_TYPES.GAME_UPDATE, currentPlayer)    
   }
 
+  flipTile(player) {
+    const newLetter = this.unflipped.pop()
+    this.flipped.push(newLetter);
+    this.sendServerMessage(`${player} flipped the letter ${newLetter}`)
+  }
+  
+  handleCommand(data) {
+    switch(data.message) {
+      case 'flip':
+        this.flipTile(data.player)
+    }
+  }
+
+  handlePlayerMessage(data) {
+    if (Constants.CHAT_MSG_TYPES.COMMANDS[data.message]) {
+      this.handleCommand(data)
+    } else {
+      this.sendMessage(data)
+    }
+  }
+
+  sendServerMessage(message) {
+    const data = {
+      type: Constants.CHAT_MSG_TYPES.SERVER_MESSAGE,
+      message: message
+    }
+    this.sendMessage(data)
+  }
+
+  sendMessage(data) {
+    this.io.in(this.room).emit(Constants.MSG_TYPES.MESSAGE, data) 
+  }
+
   addPlayer(socket, nickname) {
     this.players[socket.id] = {
       socket: socket,
@@ -49,9 +82,11 @@ class Room {
     if (!this.currentPlayer)
       this.currentPlayer = socket.id;
     this.playerOrder.push(socket.id);
+    this.sendServerMessage(`Player: ${nickname} has joined the room!`)
   }
 
   removePlayer(socket) {
+    this.sendServerMessage(`Player: ${this.players[socket.id].nickname} has left the room!`)
     delete this.players[socket.id]
   }
 

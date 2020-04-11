@@ -10,9 +10,9 @@ class Game {
     this.shouldSendUpdate = false;
   }
 
-  getPlayerRoom(id) {
-    if (this.players[id])
-      return this.rooms[this.players[id].room]
+  getPlayerRoom(socket) {
+    if (this.players[socket.id])
+      return this.rooms[this.players[socket.id].room]
   }
 
   addPlayer(socket, nickname, room) {
@@ -30,21 +30,22 @@ class Game {
     }
   }
 
-  handleMessage(socket, message) {
+  handlePlayerMessage(socket, message) {
     const data = {
+      type: Constants.CHAT_MSG_TYPES.PLAYER_MESSAGE,
       player: this.players[socket.id].nickname,
       message: message
     }
-    this.io.in(this.players[socket.id].room).emit(Constants.MSG_TYPES.SEND_MESSAGE, data)
+    this.getPlayerRoom(socket).handlePlayerMessage(data)
   }
 
   removePlayer(socket) {
-    this.getPlayerRoom(socket.id) && this.getPlayerRoom(socket.id).removePlayer(socket)
+    this.getPlayerRoom(socket) && this.getPlayerRoom(socket).removePlayer(socket)
     delete this.players[socket.id];
   }
 
   handlePlayerUpdate(socket, data) {
-    this.getPlayerRoom(socket.id) && this.getPlayerRoom(socket.id).update(socket, data)
+    this.getPlayerRoom(socket) && this.getPlayerRoom(socket).update(socket, data)
   }
 }
 

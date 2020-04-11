@@ -1,18 +1,18 @@
 import React from 'react';
-import {BrowserRouter, Switch, Route} from 'react-router-dom';
+import {HashRouter, Switch, Route} from 'react-router-dom';
 import Menu from './pages/Menu';
-import Game from './pages/Game';
+import Room from './pages/Room';
 import './App.css'
 
 function App() {
   return(
     <div>
-      <BrowserRouter>
+      <HashRouter>
         <Switch>
-          <Route exact path='/room/:room' component={Game}/>
+          <Route exact path='/room/:room' component={Room}/>
           <Route path={['/invite/:room','*']} component={Menu}/>
         </Switch>
-      </BrowserRouter>
+      </HashRouter>
     </div>
   );
 }

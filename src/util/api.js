@@ -27,5 +27,5 @@ export const joinRoom = (socket, room, nickname) => {
 }
 
 export const sendMessage = (socket, message) => {
-  socket.emit(Constants.MSG_TYPES.SEND_MESSAGE, message);
+  socket.emit(Constants.MSG_TYPES.MESSAGE, message);
 }

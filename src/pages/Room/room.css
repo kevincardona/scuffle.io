@@ -18,3 +18,11 @@
   width: 30vw;
   height: auto;
 }
+
+#letters--center {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 100%;
+}

@@ -15,11 +15,10 @@ export default class Chat extends Component {
   }
 
   componentDidMount() {
-    socket.on(Constants.MSG_TYPES.SEND_MESSAGE, (message)=>{this.getMessage(message)})
-  }
-
-  componentDidUpdate() { 
-    this.messageRef.current.scrollTop = this.messageRef.current.scrollHeight;
+    socket.on(Constants.MSG_TYPES.MESSAGE, (message) => {
+      this.getMessage(message);
+      this.messageRef.current.scrollTop = this.messageRef.current.scrollHeight
+    })
   }
 
   updateInput = (e) => {
@@ -50,14 +49,23 @@ export default class Chat extends Component {
       <div id="chat" className="mb-3">
         <ul id="messages" ref={this.messageRef}>
           {
-            messages.map((data) => {
-              return (
-                <li className="chat-message">
-                  <label className="player-name">{data.player + ':'}</label>
-                  {" "}
-                  <label className='message'>{data.message}</label>
-                </li>
-              )
+            messages.map((data, index) => {
+              switch (data.type) {
+                case Constants.CHAT_MSG_TYPES.PLAYER_MESSAGE:
+                  return (
+                    <li key={index} className="message player-message">
+                      <label className="player-name">{data.player + ':'}</label>
+                      {" "}
+                      <label className='message'>{data.message}</label>
+                    </li>
+                  )
+                case Constants.CHAT_MSG_TYPES.SERVER_MESSAGE:
+                  return (
+                    <li key={index} className="message server-message">
+                      <label className='message'>{data.message}</label>
+                    </li>
+                  )
+              }
             })
           }
         </ul>

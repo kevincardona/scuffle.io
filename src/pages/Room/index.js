@@ -3,9 +3,10 @@ import {socket, joinRoom} from '../../util/api';
 import Constants from '../../constants';
 import Loader from '../../assets/loader.svg';
 import Chat from '../../components/Chat';
-import './game.css';
+import Tile from '../../components/Tile';
+import './room.css';
 
-export default class Game extends Component {
+export default class Room extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -21,11 +22,12 @@ export default class Game extends Component {
   }
 
   updateRoom = (data) => {
-    this.setState({ loading: false})
+    console.warn(data)
+    this.setState({loading: false, players: data.players, unflipped: data.unflipped.length, flipped: data.flipped})
   }
 
   render() {
-    const {loading} = this.state
+    const {loading, flipped} = this.state
     if (loading) {
       return (
         <div id="loading">
@@ -36,6 +38,15 @@ export default class Game extends Component {
     }
     return (
       <div id='Game'>
+        <div id="letters--center">
+          {
+            [...Array(Constants.GAME.TILE_COUNT)].map((e, i) => {
+              if (i < flipped.length)
+                return <Tile letter={flipped[i]}/>
+              return <Tile/>
+            })
+          }
+        </div>
         <Chat socket={socket}/>
       </div>
     )

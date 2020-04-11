@@ -21,7 +21,7 @@ const io = socketio(server);
 io.on('connection', socket => {
   console.log('Player connected!', socket.id);
   socket.on(Constants.MSG_TYPES.JOIN_ROOM, joinRoom);
-  socket.on(Constants.MSG_TYPES.SEND_MESSAGE, handleMessage)
+  socket.on(Constants.MSG_TYPES.MESSAGE, handlePlayerMessage)
   socket.on(Constants.MSG_TYPES.DISCONNECT, onDisconnect);
 });
 
@@ -31,9 +31,9 @@ function joinRoom(data) {
   game.addPlayer(this, data.nickname, data.room);
 }
 
-function handleMessage(message) {
-  console.log(`Handling message: ${message}`)
-  game.handleMessage(this, message);
+function handlePlayerMessage(message) {
+  console.log(`Handling player message: ${message}`)
+  game.handlePlayerMessage(this, message);
 }
 
 function onDisconnect() {

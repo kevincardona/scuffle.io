@@ -2,7 +2,8 @@
   position: absolute;
   bottom: 0%;
   left: 50%;
-  width: 500px;
+  width: 100vw;
+  max-width: 500px;
   transform: translateX(-50%);
   background-color: white;
   border-radius: 5px;
@@ -20,11 +21,17 @@
   list-style-type: none;
 }
 
+@media only screen and (max-width: 600px) {
+  #chat ul{
+    height: 100px;
+  }
+}
+
 #chat .player-name {
   font-weight: bold;
 }
 
-.chat-message {
+.message {
   border-radius: 10px;
   padding: 5px;
   width: 80%;
@@ -32,5 +39,13 @@
   margin-right: auto;
   margin-top: 5px;
   margin-bottom: 5px;
+}
+
+.player-message {
   background-color: lightgray;
 }
+
+.server-message {
+  background-color: rgb(161, 217, 255);
+}
+
