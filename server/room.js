@@ -68,7 +68,7 @@ class Room {
       let found = false
       for(let i = 0; i < this.flipped.length; i++) {
         const flippedLetter = this.flipped[i];
-        if (letter == flippedLetter && found[i] == undefined) {
+        if (letter.toLowerCase() == flippedLetter.toLowerCase() && !foundLetters[i]) {
           foundLetters[i] = i;
           found = true;
           break
@@ -89,7 +89,7 @@ class Room {
   }
 
   claimWord(data, word) {
-    let indices = this.checkCenter([...word.toUpperCase()]);
+    let indices = this.checkCenter([...word.toLowerCase()]);
     if (indices !== false) {
       this.takeFromCenter(indices)
     } else {
@@ -98,7 +98,7 @@ class Room {
   }
 
   handlePlayerMessage(data) {
-    const commands = data.message.split(' ')
+    const commands = data.message.toLowerCase().split(' ')
     if (Constants.CHAT_MSG_TYPES.COMMANDS[commands[0]]) {
       this.handleCommand(data, commands)
     } else {
@@ -124,7 +124,12 @@ class Room {
   }
 
   sendMessage(data) {
-    this.io.in(this.room).emit(Constants.MSG_TYPES.MESSAGE, data) 
+    switch (data.type) {
+      case Constants.CHAT_MSG_TYPES.SERVER_MESSAGE:
+        return this.io.in(this.room).emit(Constants.MSG_TYPES.MESSAGE, data) 
+      case Constants.CHAT_MSG_TYPES.PLAYER_MESSAGE:
+        return this.io.in(this.room).emit(Constants.MSG_TYPES.MESSAGE, data) 
+    }
   }
 
   addPlayer(socket, nickname) {
@@ -135,19 +140,12 @@ class Room {
     if (!this.currentPlayer)
       this.currentPlayer = socket.id;
     this.playerOrder.push(socket.id);
-    this.sendServerMessage(`Player: ${nickname} has joined the room!`)
+    this.sendServerMessage(`${nickname} has joined the room!`)
   }
 
   removePlayer(socket) {
     this.sendServerMessage(`Player: ${this.players[socket.id].nickname} has left the room!`)
     delete this.players[socket.id]
-  }
-
-  serializeForUpdate() {
-    return {
-      id: this.id,
-      words: this.words
-    }
   }
 }
 

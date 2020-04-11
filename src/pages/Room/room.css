@@ -1,4 +1,26 @@
-#loading {
+#room {
+  width: 100vw;
+  height: 100vh;
+}
+
+#letters--container {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  flex-wrap: wrap;
+  overflow: auto;
+  width: 90%;
+  max-width: 1000px;
+  max-height: calc(100% - 240px);
+  padding-top: 15px;
+  margin: auto;
+}
+
+#letters--container::-webkit-scrollbar {
+  display: none;
+}
+
+.loading {
   position: fixed;
   top: 40%;
   left: 50%;
@@ -6,7 +28,7 @@
   width: 30vw;
 }
 
-#loading h3 {
+.loading h3 {
   width: 100%;
   font-size: 2vw;
   text-align: center;
@@ -14,20 +36,7 @@
   bottom: 17%;
 }
 
-#loader {
+.loader {
   width: 30vw;
   height: auto;
-}
-
-#letters--center {
-  display: flex;
-  justify-content: center;
-  flex-direction: row;
-  flex-wrap: wrap;
-  overflow: auto;
-  width: 100%;
-}
-
-#letters--center::-webkit-scrollbar {
-  display: none;
 }

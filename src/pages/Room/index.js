@@ -29,15 +29,15 @@ export default class Room extends Component {
     const {loading, flipped} = this.state
     if (loading) {
       return (
-        <div id="loading">
+        <div className="loading">
           <h3 className="text-muted font-weight-bold">LOADING</h3>
-          <object type="image/svg+xml" id="loader" data={Loader} aria-label="Loading..."/>
+          <object type="image/svg+xml" className="loader" data={Loader} aria-label="Loading..."/>
         </div> 
       )
     }
     return (
-      <div id='Game'>
-        <div id="letters--center">
+      <div id='room'>
+        <div id="letters--container">
           {
             [...Array(Constants.GAME.TILE_COUNT)].map((e, i) => {
               if (i < flipped.length)

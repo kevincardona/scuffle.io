@@ -1,5 +1,5 @@
-import React, {Component} from 'react';
-import { socket, sendMessage } from '../../util/api';
+import React, {Component, Fragment} from 'react';
+import { socket, sendMessage, getSocketId } from '../../util/api';
 import Constants from '../../constants';
 import './chat.css';
 
@@ -46,23 +46,31 @@ export default class Chat extends Component {
   render() {
     const {input, messages} = this.state
     return (
-      <div id="chat" className="mb-3">
+      <div id="chat">
         <ul id="messages" ref={this.messageRef}>
           {
             messages.map((data, index) => {
               switch (data.type) {
                 case Constants.CHAT_MSG_TYPES.PLAYER_MESSAGE:
                   return (
-                    <li key={index} className="message player-message">
-                      <label className="player-name">{data.player + ':'}</label>
-                      {" "}
-                      <label className='message'>{data.message}</label>
+                    <li key={index} className="message">
+                      { data.playerId === getSocketId() ?
+                        <label className="message__bubble message__bubble--player-current">{data.message}</label>
+                        :
+                        <Fragment>
+                          <label className="font-weight-bold">{data.player + ':'}</label>
+                          {" "}
+                          <label className="message__bubble">{data.message}</label>
+                        </Fragment>
+                      }
                     </li>
                   )
                 case Constants.CHAT_MSG_TYPES.SERVER_MESSAGE:
                   return (
-                    <li key={index} className="message server-message">
-                      <label className='message'>{data.message}</label>
+                    <li key={index} className="message">
+                      <label className="font-weight-bold">🎮:</label>
+                      {" "}
+                      <label className="message__bubble message__bubble--server-info">{data.message}</label>
                     </li>
                   )
               }

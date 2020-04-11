@@ -34,6 +34,7 @@ class Game {
     const data = {
       type: Constants.CHAT_MSG_TYPES.PLAYER_MESSAGE,
       player: this.players[socket.id].nickname,
+      playerId: socket.id,
       message: message
     }
     this.getPlayerRoom(socket).handlePlayerMessage(data)

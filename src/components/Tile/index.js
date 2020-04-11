@@ -3,10 +3,10 @@ import './tile.css';
 
 const Tile = ({letter}) => {
   const [tileLetter, setLetter] = useState('')
-  const [flipped, setFlipped] = useState('tile--flipped')
+  const [flipped, setFlipped] = useState('tile--unflipped')
   useEffect (()=> {
     if (letter)
-      setFlipped('')
+      setFlipped('tile--flipped')
     setLetter(letter)
   },[letter])
 

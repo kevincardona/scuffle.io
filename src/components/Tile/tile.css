@@ -8,10 +8,17 @@
   text-align: center;
   transition: transform 0.5s;
   transform-style: preserve-3d;
+  transform: rotate( random(-100, 100)deg);
 }
 
-.tile--flipped {
+.tile--flipped:hover {
+  animation: shake 0.3s;
+}
+
+.tile--unflipped {
   transform: rotateY(180deg);
+  animation-duration: 1s;
+  animation-name: slidein;
 }
 
 .tile__face {
@@ -30,4 +37,21 @@
 .tile__face--back {
   backface-visibility: hidden;
   transform: rotateY( 180deg );
+}
+
+@keyframes slidein {
+  from {
+    transform: translateX(100vw) translateY(50vh);
+  }
+
+  to {
+    transform: translateX(0px) translateY(0vh);
+
+  }
+}
+
+@keyframes shake {
+  0% { transform: translate(1px, 1px) rotate(1deg); }
+  50% { transform: translate(1px, 1px) rotate(-1deg); }
+  100% { transform: translate(0px, 0px) rotate(1deg); }
 }

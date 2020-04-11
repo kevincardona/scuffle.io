@@ -11,6 +11,10 @@ const connectedPromise = new Promise(resolve => {
   });
 })
 
+export const getSocketId = () => {
+  return socket.id
+}
+
 export const connect = onClose => (
   connectedPromise.then(() => {
     socket.on('disconnect', () => {

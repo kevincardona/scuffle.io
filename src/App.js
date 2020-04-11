@@ -6,14 +6,12 @@ import './App.css'
 
 function App() {
   return(
-    <div>
-      <HashRouter>
-        <Switch>
-          <Route exact path='/room/:room' component={Room}/>
-          <Route path={['/invite/:room','*']} component={Menu}/>
-        </Switch>
-      </HashRouter>
-    </div>
+    <HashRouter>
+      <Switch>
+        <Route exact path='/room/:room' component={Room}/>
+        <Route path={['/invite/:room','*']} component={Menu}/>
+      </Switch>
+    </HashRouter>
   );
 }
 
