@@ -1,19 +1,23 @@
 module.exports = Object.freeze({
+    COMMANDS: {
+      FLIP: 'FLIP',
+      CLAIM: 'CLAIM'
+    },
     MSG_TYPES: {
       CREATE_ROOM: 'create_room',
       JOIN_ROOM: 'join_room',
       LEAVE_ROOM: 'leave_room',
       MESSAGE: 'message',
       GAME_UPDATE: 'update',
+      PLAYER_ACTION: 'player_action',
       INPUT: 'input',
       DISCONNECT: 'disconnect'
     },
     CHAT_MSG_TYPES: {
       SERVER_MESSAGE: 'server_message',
       PLAYER_MESSAGE: 'player_message',
-      COMMANDS: {
-        'flip': 'flip',
-        'claim': 'claim'
+      MODIFIERS: {
+        PRIVATE: 'private'
       }
     },
     GAME: {

@@ -1,5 +1,7 @@
 # SCUFFLE
+[![Heroku](http://heroku-badge.herokuapp.com/?app=angularjs-crypto&style=flat&svg=1)]
 
+##### About
 This is a <b>WIP</b> game that I am working on to play with my family during self isolation. (My families version of "Bananagrams")
 
 ## RULES

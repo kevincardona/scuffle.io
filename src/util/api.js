@@ -23,7 +23,12 @@ export const connect = onClose => (
   })
 )
 
-export const createRoom = data => {
+export const triggerAction = (socket, action) => {
+  socket.emit(Constants.MSG_TYPES.PLAYER_ACTION, action)
+}
+
+export const leaveRoom = (socket) => {
+  socket.emit(Constants.MSG_TYPES.LEAVE_ROOM);
 }
 
 export const joinRoom = (socket, room, nickname) => {

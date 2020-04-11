@@ -1,7 +1,7 @@
 import React, {Component, Fragment} from 'react';
 import { socket, sendMessage, getSocketId } from '../../util/api';
 import Constants from '../../constants';
-import './chat.css';
+import './chat.scss';
 
 export default class Chat extends Component {
   constructor(props) {
@@ -17,7 +17,8 @@ export default class Chat extends Component {
   componentDidMount() {
     socket.on(Constants.MSG_TYPES.MESSAGE, (message) => {
       this.getMessage(message);
-      this.messageRef.current.scrollTop = this.messageRef.current.scrollHeight
+      if (this.messageRef.current)
+        this.messageRef.current.scrollTop = this.messageRef.current.scrollHeight
     })
   }
 

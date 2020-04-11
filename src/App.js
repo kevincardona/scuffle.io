@@ -2,7 +2,7 @@ import React from 'react';
 import {HashRouter, Switch, Route} from 'react-router-dom';
 import Menu from './pages/Menu';
 import Room from './pages/Room';
-import './App.css'
+import './App.scss'
 
 function App() {
   return(

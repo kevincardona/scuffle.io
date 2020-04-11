@@ -1,14 +1,17 @@
 .tile {
   width: 50px;
   height: 50px;
-  font-size: 40px;
-  line-height: 50px;
   border-radius: 8px;
   margin: 2px;
   text-align: center;
+  transition-delay: 20s;
   transition: transform 0.5s;
   transform-style: preserve-3d;
-  transform: rotate( random(-100, 100)deg);
+}
+
+.tile__letter {
+  font-size: 40px;
+  line-height: 50px;
 }
 
 .tile--flipped:hover {
@@ -28,6 +31,7 @@
   border-radius: 8px;
   background: linear-gradient(to top, darkgray, 1%, rgb(253,235,185));
   backface-visibility: hidden;
+  user-select: none;
 }
 
 .tile__face--front {
@@ -41,11 +45,11 @@
 
 @keyframes slidein {
   from {
-    transform: translateX(100vw) translateY(50vh);
+    transform: translateX(100vw);
   }
 
   to {
-    transform: translateX(0px) translateY(0vh);
+    transform: translateX(0px);
 
   }
 }

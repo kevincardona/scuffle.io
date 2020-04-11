@@ -1,10 +1,11 @@
 import React, {Component} from 'react';
-import {socket, joinRoom} from '../../util/api';
+import {socket, joinRoom, leaveRoom, triggerAction} from '../../util/api';
 import Constants from '../../constants';
 import Loader from '../../assets/loader.svg';
+import ControlPanel from '../../components/ControlPanel';
 import Chat from '../../components/Chat';
 import Tile from '../../components/Tile';
-import './room.css';
+import './room.scss';
 
 export default class Room extends Component {
   constructor(props) {
@@ -21,8 +22,21 @@ export default class Room extends Component {
     socket.on(Constants.MSG_TYPES.GAME_UPDATE, this.updateRoom)
   }
 
+  componentWillUnmount() {
+    leaveRoom(socket)
+  }
+
   updateRoom = (data) => {
-    this.setState({loading: false, players: data.players, unflipped: data.unflipped.length, flipped: data.flipped})
+    this.setState({loading: false, players: data.players, unflipped: data.unflippedCount, flipped: data.flipped})
+  }
+
+  sendFlipCommand = () => {
+    const { socket } = this.props
+    if (!socket)
+      return
+    triggerAction(socket, {
+      command: Constants.COMMANDS.FLIP
+    })
   }
 
   render() {
@@ -43,11 +57,13 @@ export default class Room extends Component {
               if (i < flipped.length)
                 return <Tile letter={flipped[i]}/>
               if (i < flipped.length + 1)
-                return <Tile/>
+                return <Tile onClick={() => {triggerAction(socket, {command: Constants.COMMANDS.FLIP})}}/>
             })
           }
         </div>
-        <Chat socket={socket}/>
+        <ControlPanel socket={socket}>
+          <Chat socket={socket}/>
+        </ControlPanel>
       </div>
     )
   }

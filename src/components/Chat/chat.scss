@@ -30,7 +30,7 @@ label {
 .message__bubble {
   padding: 5px 10px 5px 10px;
   border-radius: 10px;
-  background-color: #a1d9ff;
+  background-color: rgb(161, 217, 255);
 }
 
 .message__bubble--player-current {
@@ -38,18 +38,20 @@ label {
 }
 
 .message__bubble--server-info {
-  background-color: #ffa1ff;
+  background-color: rgb(255, 161, 255);
 }
 
 .message__bubble--server-error {
-  background-color: #ffa1a1;
+  background-color: rgb(255, 161, 161);
 }
 
-@media screen and (max-width: 600px) and (max-height: 900px) {
+@media screen and (max-width: 600px) and (max-height: 900px){
   #chat {
     border-radius: 0px;
   }
-  #chat ul {
+  #chat ul{
     height: 200px;
   }
 }
+
+

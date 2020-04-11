@@ -5,7 +5,7 @@ class Room {
   constructor(io, room) {
     this.room = room;
     this.players = new Object();
-    this.playerOrder = [];
+    this.playerOrder = new Array();
     this.flipped = new Array(Constants.GAME.TILE_COUNT)
     this.currentPlayer = null;
     this.io = io
@@ -14,7 +14,6 @@ class Room {
   }
 
   generateTable() {
-    let tally = 0
     this.unflipped = []
     this.flipped = []
     Object.keys(Constants.GAME.LETTER_DISTRIBUTION).forEach((letter)=>{
@@ -33,7 +32,7 @@ class Room {
       return this.players[player].nickname
     })
     const data = {
-      unflipped: this.unflipped,
+      unflippedCount: this.unflipped.length,
       flipped: this.flipped,
       players: players
     }
@@ -41,23 +40,16 @@ class Room {
     return data;
   }
 
+  getSocket(playerId) {return this.players[playerId].socket}
+
   update() {
     const currentPlayer = this.getRoomData()
     this.io.in(this.room).emit(Constants.MSG_TYPES.GAME_UPDATE, currentPlayer)    
   }
 
-  flipTile(data, index) {
-    let newLetter = null
-    if (index) {
-      newLetter = this.unflipped[index]
-      if (newLetter) {
-        this.unflipped.splice(index, 1)
-      }
-    } else {
-      newLetter = this.unflipped.pop()
-    }
-    if (!newLetter)
-      return
+  flipTile(data) {
+    let newLetter = this.unflipped.pop()
+    if (!newLetter) return
     this.flipped.push(newLetter);
     this.sendServerMessage(`${data.player} flipped the letter ${newLetter}`)
   }
@@ -85,7 +77,6 @@ class Room {
     this.flipped = this.flipped.filter((_, index) => {
       return indices[index] == undefined
     })
-    console.log(this.flipped)
   }
 
   claimWord(data, word) {
@@ -93,26 +84,35 @@ class Room {
     if (indices !== false) {
       this.takeFromCenter(indices)
     } else {
-      this.sendServerMessage('NOT FOUND FOOL')
+      this.sendPrivateServerMessage(this.getSocket(data.playerId), 'That word can\'t be made!')
     }
   }
 
   handlePlayerMessage(data) {
     const commands = data.message.toLowerCase().split(' ')
-    if (Constants.CHAT_MSG_TYPES.COMMANDS[commands[0]]) {
-      this.handleCommand(data, commands)
+    if (Constants.COMMANDS[commands[0]]) {
+      this.handleCommand(data, commands[0], commands.slice(1))
     } else {
       this.sendMessage(data)
     }
   }
-  
-  handleCommand(data, commands) {
-    switch(commands[0]) {
-      case 'flip':
-        return this.flipTile(data, parseInt(commands.slice(1)))
-      case 'claim':
-        return this.claimWord(data, commands[1])
+
+  handleCommand(data, command, args) {
+    switch(command) {
+      case Constants.COMMANDS.FLIP:
+        return this.flipTile(data)
+      case Constants.COMMANDS.CLAIM:
+        return this.claimWord(data, args[0])
     }
+  }
+
+  sendPrivateServerMessage(socket, message) {
+    const data = {
+      type: Constants.CHAT_MSG_TYPES.SERVER_MESSAGE,
+      typeModifier: Constants.CHAT_MSG_TYPES.MODIFIERS.PRIVATE,
+      message: message
+    }
+    socket.emit(Constants.MSG_TYPES.MESSAGE, data)
   }
 
   sendServerMessage(message) {
