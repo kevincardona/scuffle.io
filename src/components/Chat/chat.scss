@@ -45,7 +45,15 @@ label {
   background-color: rgb(255, 161, 161);
 }
 
-@media screen and (max-width: 600px), screen and (max-height: 900px){
+.chat {
+  &__input {
+    &--message {
+      height: auto;
+    }
+  }
+}
+
+@media screen and (max-width: 900px), screen and (max-height: 900px){
   #chat {
     border-radius: 0px;
   }

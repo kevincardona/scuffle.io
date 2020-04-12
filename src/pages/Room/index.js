@@ -5,6 +5,7 @@ import Loader from '../../assets/loader.svg';
 import ControlPanel from '../../components/ControlPanel';
 import Leaderboard from '../../components/Leaderboard';
 import Chat from '../../components/Chat';
+import Modal from '../../components/Modal';
 import Tile from '../../components/Tile';
 import './room.scss';
 
@@ -13,7 +14,7 @@ export default class Room extends Component {
     super(props);
     this.state = {
       loading: true,
-      isModalOpen: true,
+      isModalOpen: false,
       modalData: null
     }
   }
@@ -30,30 +31,33 @@ export default class Room extends Component {
   }
 
   updateRoom = (data) => {
-    this.setState({loading: false, players: data.players, unflipped: data.unflippedCount, flipped: data.flipped})
+    this.setState({
+      loading: false, 
+      players: data.players, 
+      unflipped: data.unflippedCount, 
+      flipped: data.flipped,
+      room: data.room
+    })
   }
 
-  closeModal = () => {this.setState({isModalOpen: false, modalData: null, modalInput: null})}
-
-  updateInput = (e) => {
-    this.setState({ modalInput: e.target.value })
-  }
+  closeModal = () => { this.setState({ isModalOpen: false, modalData: null }) }
 
   triggerSteal = (player) => {
     let modalData = {
-      header: `Stealing word: ${player.word} from ${player.nickname}`,
-      prompt: `New word:`,
-      submit: (word)=>{triggerAction(socket, {command: Constants.COMMANDS.STEAL_WORD, args: [player, word]}); this.closeModal()}
+      header: `Steal Word: ${player.word}`,
+      prompt: `New Word`,
+      submit: (word)=>{triggerAction(socket, {command: Constants.COMMANDS.STEAL_WORD, args: [player, word]});},
+      close: this.closeModal
     }
     this.setState({isModalOpen: true, modalData: modalData})
   }
 
   triggerCreate = () => {
-    console.warn("CREATING MODAL")
     let modalData = {
-      header: `Creating Word`,
-      prompt: `New word:`,
-      submit: (word) => {triggerAction(socket, { command: Constants.COMMANDS.CREATE_WORD, args: [word]}); this.closeModal() }
+      header: `Create Word`,
+      prompt: `New Word`,
+      submit: (word) => {triggerAction(socket, { command: Constants.COMMANDS.CREATE_WORD, args: [word]});},
+      close: this.closeModal
     }
     this.setState({ isModalOpen: true, modalData: modalData })
   }
@@ -68,7 +72,7 @@ export default class Room extends Component {
   }
 
   render() {
-    const {loading, flipped, players, unflipped, isModalOpen, modalData, modalInput} = this.state
+    const {loading, flipped, players, unflipped, room, isModalOpen, modalData} = this.state
     if (loading) {
       return (
         <div className="loading">
@@ -79,20 +83,11 @@ export default class Room extends Component {
     }
     return (
       <div id='room'>
-        {
-          isModalOpen && modalData != null &&
-            <div className="action-menu">
-              <h3>{modalData.header}</h3>
-              <p>{modalData.prompt}</p>
-              <input onChange={(e) => this.updateInput(e)}></input>
-              <button onClick={() => { modalData.submit(modalInput) }}>Submit</button>
-              <button onClick={this.closeModal}>Cancel</button>
-            </div>
-        }
         <div className="panel--left">
-          <Leaderboard players={players} unflipped={unflipped} steal={this.triggerSteal}/>
+          <Leaderboard players={players} unflipped={unflipped} steal={this.triggerSteal} room={room}/>
         </div>
         <div className="panel--right">
+          <Modal {...modalData} isOpen={isModalOpen} />
           <div id="letters--container">
             {
               [...Array(Constants.GAME.TILE_COUNT)].map((e, i) => {

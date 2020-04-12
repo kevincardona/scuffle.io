@@ -32,9 +32,6 @@ export default class ControlPanel extends Component {
             <button className="control__button control__button--create" onClick={create}>
               Create Word
             </button>
-            <button className="control__button control__button--steal">
-              Steal Word
-            </button>
           </div>
           {children}
         </div>

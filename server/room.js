@@ -1,5 +1,6 @@
 const Constants = require('../src/constants');
 const helpers = require('./utils/helpers');
+const checkWord = require('check-word'), words = checkWord('en');
 
 class Room {
   constructor(io, room) {
@@ -37,6 +38,7 @@ class Room {
       }
     })
     const data = {
+      room: this.room,
       unflippedCount: this.unflipped.length,
       flipped: this.flipped,
       players: players
@@ -57,6 +59,12 @@ class Room {
     if (!newLetter) return
     this.flipped.push(newLetter);
     this.sendServerMessage(`${data.player} flipped the letter ${newLetter}`)
+  }
+
+  isValidWord(word) {
+    if (!word || word.length < 3)
+      return false
+    return words.check(word)
   }
 
   checkCenterForWord(letters) {
@@ -84,14 +92,30 @@ class Room {
     })
   }
 
+  addWordToPlayer(playerId, word) {
+    const player = this.players[playerId]
+    if (!player.words)
+      player.words = []
+    player.words.push(word.toUpperCase());
+    player.score += word.length
+  }
+
+  removeWordFromPlayer(playerId, word) {
+    const player = this.players[playerId]
+    if (!player.words)
+      player.words = []
+    player.words.splice(player.words.indexOf(word), 1)
+    player.score -= word.length
+  }
+
   createWord(data, word) {
+    if (!this.isValidWord(word)) {
+      return this.sendPrivateServerMessage(this.getSocket(data.playerId), 'That\'s an invalid word! Your word needs to be real and at least 3 characters long!')
+    }
     let indices = this.checkCenterForWord([...word.toUpperCase()]);
     const player = this.players[data.playerId]
     if (indices !== false) {
-      if (!player.words)
-        player.words = []
-      player.words.push(word.toUpperCase());
-      player.score += word.length
+      this.addWordToPlayer(data.playerId, word)
       this.takeFromCenter(indices)
       this.sendServerMessage(`Player: ${player.nickname} made the word: ${word}`)
     } else {
@@ -99,12 +123,66 @@ class Room {
     }
   }
 
+  getLetterMap(word) {
+    const letters = {}
+    for(let i = 0; i < word.length; i++) {
+      if (!letters[word.charAt(i)])
+        letters[word.charAt(i).toUpperCase()] = 0
+      letters[word.charAt(i).toUpperCase()]++;
+    }
+    return letters;
+  }
+
+  letterMapToWord(letterMap) {
+    let word = []
+    Object.keys(letterMap).forEach((letter) => {
+      for(let i = 0; i < letterMap[letter]; i++) {
+        word.push(letter.toUpperCase())
+      }
+    })
+    return word
+  }
+
+  checkWordContainsOther(oldWord, newWordMap, oldWordMap) {
+    Object.keys(oldWordMap).forEach((letter) => {
+      if (oldWordMap[letter] > newWordMap[letter]) {
+        return false
+      } else if (oldWordMap[letter] == newWordMap[letter]) {
+        delete newWordMap[letter];
+      } else {
+        newWordMap[letter] -= oldWordMap[letter]
+      }
+    })
+    if (Object.keys(newWordMap).length === 0)
+      return false
+    return newWordMap
+  }
+
   stealWord(data, args) {
     const oldWord = args[0].word
     const newWord = args[1]
-    console.log("turning" + oldWord)
-    console.log("into" + newWord)
-    
+    if (!newWord || !oldWord) {
+      return
+    }
+    const difference = this.checkWordContainsOther(oldWord, this.getLetterMap(newWord), this.getLetterMap(oldWord))
+    console.warn("DIFFERENCE")
+    console.warn(difference)
+    if (!difference) {
+      return this.sendPrivateServerMessage(this.getSocket(data.playerId), `The word ${newWord} doesn't contain all of the letters from ${oldWord} + at least 1 from the center!!`);
+    }
+    if (!this.isValidWord(newWord)) {
+      return this.sendPrivateServerMessage(this.getSocket(data.playerId), 'That\'s an invalid word! Your word needs to be real and at least 3 characters long!')
+    }
+    const correctCenterPieces = this.checkCenterForWord(this.letterMapToWord(difference));
+    if (!correctCenterPieces) {
+      return this.sendPrivateServerMessage(this.getSocket(data.playerId), `The word ${newWord} contains some letters that aren't in the center!!`);
+    } else {
+      this.takeFromCenter(correctCenterPieces)
+    }
+    this.removeWordFromPlayer(args[0].playerId, oldWord);
+    this.addWordToPlayer(data.playerId, newWord);
+    this.sendServerMessage(`Player: ${this.players[data.playerId].nickname} stole the word: ${oldWord.toUpperCase()} to create: ${newWord.toUpperCase()}!!!`)
+
   }
 
   handlePlayerMessage(data) {

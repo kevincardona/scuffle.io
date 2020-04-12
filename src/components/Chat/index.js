@@ -79,7 +79,7 @@ export default class Chat extends Component {
           }
         </ul>
         <div className="input-group">
-          <input type="text" className="form-control" placeholder="Message" onKeyPress={this.onKeyPress} value={input} onChange={(e) => this.updateInput(e)}/>
+          <input type="text" className="form-control chat__input--message" placeholder="Message" onKeyPress={this.onKeyPress} value={input} onChange={(e) => this.updateInput(e)}/>
           <div className="input-group-append">
             <button className="btn btn-primary input-group-btn" onClick={this.send}>Send</button>
           </div>

@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import {Link} from 'react-router-dom';
 import Word from '../Word';
 import './leaderboard.scss';
 
@@ -8,22 +9,26 @@ export default class Leaderboard extends Component {
     this.state = {}
   }
   render() {
-    const {players, unflipped, steal} = this.props
+    const {players, unflipped, steal, room} = this.props
     return (
       <div id="leaderboard">
-        {unflipped && <h4>UNFLIPPED TILES: {unflipped}</h4>}
-        <h3>PLAYERS</h3>
+        <div className="leaderboard__header">
+          <h2>{room}</h2>
+          <button>INVITE A FRIEND</button>
+        </div>
+        <h4>UNFLIPPED TILES: {unflipped}</h4>
+        <h4>PLAYERS</h4>
         {
           players && players.map((player)=>{
             return (
-              <div>
+              <div className="player">
                 <div className="player--name">
                   {player.nickname}
                 </div>
                 <div className="player--score">
                   POINTS: {player.score ? player.score : 0}
                 </div>
-                WORDS: {!player.words && " NONE"}
+                {!player.words && "NO WORDS"}
                 <div className="player--words">
                   {
                     player.words && player.words.map((word)=> {

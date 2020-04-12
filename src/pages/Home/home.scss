@@ -28,7 +28,7 @@ html, body {
   width: 60vw;
   height: 100%;
   padding: 15px;
-  
+  border-radius: 20px;
 }
 
 .header {
@@ -37,9 +37,9 @@ html, body {
   font-weight: bold;
 }
 
-@media screen and (max-width: 600px){
+@media screen and (max-width: 900px), screen and (max-height: 900px) {
   .btn {
-    font-size: 5vw;
+    font-size: 2vw;
   }
   .header {
     font-size: 3vw;
