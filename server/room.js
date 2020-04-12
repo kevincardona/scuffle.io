@@ -27,6 +27,14 @@ class Room {
 
     })
   }
+  
+  resetGame() {
+    Object.keys(this.players).forEach((player) => {
+      this.players[player].words = []
+      this.players[player].score = 0;
+    })
+    this.generateTable();
+  }
 
   getRoomData() {
     const players = Object.keys(this.players).map((player) => {
@@ -59,6 +67,9 @@ class Room {
     if (!newLetter) return
     this.flipped.push(newLetter);
     this.sendServerMessage(`${data.player} flipped the letter ${newLetter}`)
+    if (this.unflipped.length === 0)
+      this.sendServerMessage(`There are no letters left to flip! To reset the game type RESET_GAME in chat!`)
+
   }
 
   isValidWord(word) {
@@ -202,6 +213,8 @@ class Room {
         return this.createWord(data, args[0])
       case Constants.COMMANDS.STEAL_WORD:
         return this.stealWord(data, args)
+      case Constants.COMMANDS.RESET_GAME:
+        return this.resetGame()
     }
   }
 
@@ -245,7 +258,8 @@ class Room {
   }
 
   removePlayer(socket) {
-    this.sendServerMessage(`Player: ${this.players[socket.id].nickname} has left the room!`)
+    if (this.players[socket.id])
+      this.sendServerMessage(`Player: ${this.players[socket.id].nickname} has left the room!`)
     delete this.players[socket.id]
   }
 }

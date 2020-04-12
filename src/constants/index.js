@@ -2,7 +2,8 @@ module.exports = Object.freeze({
     COMMANDS: {
       FLIP: 'FLIP',
       CREATE_WORD: 'CREATE_WORD',
-      STEAL_WORD: 'STEAL_WORD'
+      STEAL_WORD: 'STEAL_WORD',
+      RESET_GAME: 'RESET_GAME'
     },
     MSG_TYPES: {
       CREATE_ROOM: 'create_room',

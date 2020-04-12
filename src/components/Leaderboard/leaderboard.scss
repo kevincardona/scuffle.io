@@ -15,8 +15,9 @@
   }
   &__button {
     &--invite {
-      background-color: rgb(23, 133, 23);
-
+      background-color: rgb(94, 94, 94);
+      border-radius: 5px;
+      color: white;
     }
   }
 }
@@ -37,6 +38,5 @@
 @media screen and (max-width: 900px), screen and (max-height: 900px) {
   #leaderboard {
     height: 100%;
-    overflow-x: scroll;
   }
 }

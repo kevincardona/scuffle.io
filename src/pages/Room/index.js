@@ -62,6 +62,17 @@ export default class Room extends Component {
     this.setState({ isModalOpen: true, modalData: modalData })
   }
 
+  toggleInvite = () => {
+    let modalData = {
+      header: `Inviting a Friend`,
+      prompt: `To invite a friend send them this link: `,
+      copy:  `http://scuffle.online/#/invite/${this.state.room}`,
+      submit: null,
+      close: this.closeModal
+    }
+    this.setState({ isModalOpen: true, modalData: modalData })
+  }
+
   sendFlipCommand = () => {
     const { socket } = this.props
     if (!socket)
@@ -84,7 +95,7 @@ export default class Room extends Component {
     return (
       <div id='room'>
         <div className="panel--left">
-          <Leaderboard players={players} unflipped={unflipped} steal={this.triggerSteal} room={room}/>
+          <Leaderboard players={players} unflipped={unflipped} steal={this.triggerSteal} room={room} toggleInviteModal={this.toggleInvite}/>
         </div>
         <div className="panel--right">
           <Modal {...modalData} isOpen={isModalOpen} />

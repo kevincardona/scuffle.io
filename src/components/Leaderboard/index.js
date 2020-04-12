@@ -9,12 +9,12 @@ export default class Leaderboard extends Component {
     this.state = {}
   }
   render() {
-    const {players, unflipped, steal, room} = this.props
+    const {players, unflipped, steal, room, toggleInviteModal} = this.props
     return (
       <div id="leaderboard">
         <div className="leaderboard__header">
           <h2>{room}</h2>
-          <button>INVITE A FRIEND</button>
+          <button className="leaderboard__button--invite" onClick={toggleInviteModal}>INVITE FRIEND</button>
         </div>
         <h4>UNFLIPPED TILES: {unflipped}</h4>
         <h4>PLAYERS</h4>

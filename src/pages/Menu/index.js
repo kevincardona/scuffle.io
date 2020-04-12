@@ -4,7 +4,7 @@ import './menu.scss'
 
 const Menu = (props) => {
   const [room, setRoom] = useState();
-  const [nickname, setNickname] = useState('')
+  const [nickname, setNickname] = useState()
   const [disabled, setDisabled] = useState(false)
 
   useEffect(()=>{
@@ -25,19 +25,23 @@ const Menu = (props) => {
         value={nickname} 
         onChange={e => setNickname(e.target.value)} 
       />
-      <input 
-        type="text" 
-        className="input-group-text mb-2" 
-        id="room-input" 
-        placeholder="Room Code" 
-        value={room || ''} 
-        disabled={disabled}
-        onChange={e => setRoom(e.target.value)} 
-      />
+      { !disabled &&
+        <input 
+          type="text" 
+          className="input-group-text mb-2" 
+          id="room-input" 
+          placeholder="Enter Room Code" 
+          value={room || ''} 
+          disabled={disabled}
+          onChange={e => setRoom(e.target.value)} 
+        />
+      }
       <div id="menu-buttons">
-        <Link className="button--link" to={`/room/${room}?nick=${nickname}`}>
-          <button type="button" className="btn btn-primary menu-button">PLAY</button>
-        </Link>
+        { (room && nickname) &&
+          <Link className="button--link" to={`/room/${room}?nick=${nickname}`}>
+            <button type="button" className="btn btn-primary menu-button">PLAY</button>
+          </Link>
+        }
         <Link className="button--link" to={`/about`}>
           <button type="button" className="btn btn-secondary menu-button">RULES</button>
         </Link>
