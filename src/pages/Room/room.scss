@@ -1,7 +1,25 @@
 #room {
   width: 100vw;
   height: 100vh;
+  background-color: rgb(24, 24, 24);
+  overflow: hidden;
+  overscroll-behavior: none;
 }
+
+.panel {
+  &--right {
+    position: absolute;
+    right: 0%;
+    width: 80vw;
+
+  }
+  &--left {
+    position: absolute;
+    left: 0%;
+    width: 20vw;
+  }
+}
+
 
 #letters--container {
   display: flex;
@@ -13,9 +31,29 @@
   width: 90%;
   height: 100vh;
   max-width: 600px;
-  max-height: calc(100% - 333px);
+  max-height: calc(100% - 433px);
   padding-top: 15px;
   margin: auto;
+}
+
+@media screen and (max-width: 600px), screen and (max-height: 900px) {
+  #letters--container {
+    max-height: calc(100% - 305px);
+  }
+
+  .panel {
+  &--right {
+    position: absolute;
+    right: 0%;
+    width: 70vw;
+
+  }
+  &--left {
+    position: absolute;
+    left: 0%;
+    width: 30vw;
+  }
+}
 }
 
 #letters--container::-webkit-scrollbar {

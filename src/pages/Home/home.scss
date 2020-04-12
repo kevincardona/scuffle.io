@@ -1,0 +1,54 @@
+html, body {
+  overflow-y: auto;
+}
+
+#home {
+  padding-top: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 5px;
+  text-align: center;
+  color: #D1D1D1;
+}
+
+#title {
+  width: 30vw;
+  margin-bottom: -1vw;
+}
+
+#about {
+  background-color: #343434;
+  width: 500px;
+  height: 500px;
+}
+
+#how-to-play {
+  background: #343434;
+  width: 60vw;
+  height: 100%;
+  padding: 15px;
+  
+}
+
+.header {
+  color: #ABABAB;
+  font-size: 1.3vw;
+  font-weight: bold;
+}
+
+@media screen and (max-width: 600px){
+  .btn {
+    font-size: 5vw;
+  }
+  .header {
+    font-size: 3vw;
+  }
+  #how-to-play {
+    width: 100vw;
+    overflow-y: auto;
+  }
+  #title {
+    width: 100vw;
+  }
+}

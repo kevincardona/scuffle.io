@@ -34,9 +34,14 @@ const Menu = (props) => {
         disabled={disabled}
         onChange={e => setRoom(e.target.value)} 
       />
-      <Link to={`/room/${room}?nick=${nickname}`}>
-        <button id="play-button" className="btn btn-primary">PLAY</button>
-      </Link>
+      <div id="menu-buttons">
+        <Link className="button--link" to={`/room/${room}?nick=${nickname}`}>
+          <button type="button" className="btn btn-primary menu-button">PLAY</button>
+        </Link>
+        <Link className="button--link" to={`/about`}>
+          <button type="button" className="btn btn-secondary menu-button">RULES</button>
+        </Link>
+      </div>
     </div>
   )
 }

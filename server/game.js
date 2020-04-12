@@ -35,7 +35,11 @@ class Game {
   }
 
   leaveRoom(socket) {
-    this.getPlayerRoom(socket).removePlayer(socket)
+    const room = this.getPlayerRoom(socket)
+    if (room) {
+      room.removePlayer(socket)
+      socket.leave(room.room)
+    }
   }
 
   addPlayer(socket, nickname, room) {

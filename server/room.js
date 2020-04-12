@@ -9,7 +9,7 @@ class Room {
     this.flipped = new Array(Constants.GAME.TILE_COUNT)
     this.currentPlayer = null;
     this.io = io
-    setInterval(this.update.bind(this), 500);
+    setInterval(this.update.bind(this), 250);
     this.generateTable()
   }
 
@@ -29,7 +29,12 @@ class Room {
 
   getRoomData() {
     const players = Object.keys(this.players).map((player) => {
-      return this.players[player].nickname
+      return {
+        nickname: this.players[player].nickname,
+        playerId: this.players[player].playerId,
+        words: this.players[player].words,
+        score: this.players[player].score
+      }
     })
     const data = {
       unflippedCount: this.unflipped.length,
@@ -54,13 +59,13 @@ class Room {
     this.sendServerMessage(`${data.player} flipped the letter ${newLetter}`)
   }
 
-  checkCenter(letters) {
+  checkCenterForWord(letters) {
     let foundLetters = {}
     for (const letter of letters) {
       let found = false
       for(let i = 0; i < this.flipped.length; i++) {
         const flippedLetter = this.flipped[i];
-        if (letter.toLowerCase() == flippedLetter.toLowerCase() && !foundLetters[i]) {
+        if (letter.toUpperCase() == flippedLetter.toUpperCase() && !foundLetters[i]) {
           foundLetters[i] = i;
           found = true;
           break
@@ -80,17 +85,23 @@ class Room {
   }
 
   claimWord(data, word) {
-    let indices = this.checkCenter([...word.toLowerCase()]);
+    let indices = this.checkCenterForWord([...word.toUpperCase()]);
+    const player = this.players[data.playerId]
     if (indices !== false) {
+      if (!player.words)
+        player.words = []
+      player.words.push(word);
+      player.score += word.length
       this.takeFromCenter(indices)
+      this.sendServerMessage(`Player: ${player.nickname} claimed the word: ${word}`)
     } else {
       this.sendPrivateServerMessage(this.getSocket(data.playerId), 'That word can\'t be made!')
     }
   }
 
   handlePlayerMessage(data) {
-    const commands = data.message.toLowerCase().split(' ')
-    if (Constants.COMMANDS[commands[0]]) {
+    const commands = data.message.toUpperCase().split(' ')
+    if (Constants.COMMANDS[commands[0].toUpperCase()]) {
       this.handleCommand(data, commands[0], commands.slice(1))
     } else {
       this.sendMessage(data)
@@ -135,7 +146,9 @@ class Room {
   addPlayer(socket, nickname) {
     this.players[socket.id] = {
       socket: socket,
-      nickname: nickname
+      playerId: socket.id,
+      nickname: nickname,
+      score: 0
     }
     if (!this.currentPlayer)
       this.currentPlayer = socket.id;

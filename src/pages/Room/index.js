@@ -3,6 +3,7 @@ import {socket, joinRoom, leaveRoom, triggerAction} from '../../util/api';
 import Constants from '../../constants';
 import Loader from '../../assets/loader.svg';
 import ControlPanel from '../../components/ControlPanel';
+import Leaderboard from '../../components/Leaderboard';
 import Chat from '../../components/Chat';
 import Tile from '../../components/Tile';
 import './room.scss';
@@ -40,7 +41,7 @@ export default class Room extends Component {
   }
 
   render() {
-    const {loading, flipped} = this.state
+    const {loading, flipped, players, unflipped} = this.state
     if (loading) {
       return (
         <div className="loading">
@@ -51,19 +52,24 @@ export default class Room extends Component {
     }
     return (
       <div id='room'>
-        <div id="letters--container">
-          {
-            [...Array(Constants.GAME.TILE_COUNT)].map((e, i) => {
-              if (i < flipped.length)
-                return <Tile letter={flipped[i]}/>
-              if (i < flipped.length + 1)
-                return <Tile onClick={() => {triggerAction(socket, {command: Constants.COMMANDS.FLIP})}}/>
-            })
-          }
+        <div className="panel--left">
+          <Leaderboard players={players} unflipped={unflipped}/>
         </div>
-        <ControlPanel socket={socket}>
-          <Chat socket={socket}/>
-        </ControlPanel>
+        <div className="panel--right">
+          <div id="letters--container">
+            {
+              [...Array(Constants.GAME.TILE_COUNT)].map((e, i) => {
+                if (i < flipped.length)
+                  return <Tile letter={flipped[i]}/>
+                if (i < flipped.length + 1)
+                  return <Tile onClick={() => {triggerAction(socket, {command: Constants.COMMANDS.FLIP})}}/>
+              })
+            }
+          </div>
+          <ControlPanel socket={socket}>
+            <Chat socket={socket}/>
+          </ControlPanel>
+        </div>
       </div>
     )
   }

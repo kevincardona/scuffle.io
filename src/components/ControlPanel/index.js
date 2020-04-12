@@ -23,19 +23,21 @@ export default class ControlPanel extends Component {
   render () {
     const {children, socket} = this.props
     return (
-      <div id="control-panel">
-        <div id="control-panel__buttons">
-          <button className="btn btn-info control__button" onClick={this.sendFlip}>
-            Flip
-          </button>
-          <button className="btn btn-success control__button">
-            Found Word
-          </button>
-          <button className="btn btn-danger control__button">
-            Steal Word
-          </button>
+      <div className="container--center">
+        <div id="control-panel">
+          <div id="control-panel__buttons">
+            <button className="control__button control__button--flip" onClick={this.sendFlip}>
+              Flip
+            </button>
+            <button className="control__button control__button--claim">
+              Claim Word
+            </button>
+            <button className="control__button control__button--steal">
+              Steal Word
+            </button>
+          </div>
+          {children}
         </div>
-        {children}
       </div>
     )
   }
