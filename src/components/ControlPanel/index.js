@@ -7,7 +7,6 @@ export default class ControlPanel extends Component {
   constructor(props) {
     super(props)
     this.state = {
-
     }
   }
 
@@ -21,7 +20,8 @@ export default class ControlPanel extends Component {
   }
 
   render () {
-    const {children, socket} = this.props
+    const {modalIsOpen} = this.state
+    const {children, socket, create} = this.props
     return (
       <div className="container--center">
         <div id="control-panel">
@@ -29,8 +29,8 @@ export default class ControlPanel extends Component {
             <button className="control__button control__button--flip" onClick={this.sendFlip}>
               Flip
             </button>
-            <button className="control__button control__button--claim">
-              Claim Word
+            <button className="control__button control__button--create" onClick={create}>
+              Create Word
             </button>
             <button className="control__button control__button--steal">
               Steal Word

@@ -6,6 +6,16 @@
   overscroll-behavior: none;
 }
 
+.action-menu {
+  z-index: 9999;
+  position: fixed;
+  top: 40%;
+  left: 50%;
+  transform: translateY(-50%) translateX(-50%);
+  padding: 20px 30px;
+  background-color: white;
+}
+
 .panel {
   &--right {
     position: absolute;

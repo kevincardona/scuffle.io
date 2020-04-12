@@ -8,7 +8,7 @@ export default class Leaderboard extends Component {
     this.state = {}
   }
   render() {
-    const {players, unflipped} = this.props
+    const {players, unflipped, steal} = this.props
     return (
       <div id="leaderboard">
         {unflipped && <h4>UNFLIPPED TILES: {unflipped}</h4>}
@@ -28,8 +28,10 @@ export default class Leaderboard extends Component {
                   {
                     player.words && player.words.map((word)=> {
                       return (
-                        <div className="smaller" onClick={()=>console.warn(`clicked ${word}`)}>
-                        <Word word={word}/>
+                        <div onClick={()=>steal({...player, word: word})}>
+                          <div className="smaller">
+                            <Word word={word}/>
+                          </div>
                         </div>
                       )
                     })

@@ -43,7 +43,7 @@ class Room {
     }
     
     return data;
-  }
+  }1
 
   getSocket(playerId) {return this.players[playerId].socket}
 
@@ -84,19 +84,27 @@ class Room {
     })
   }
 
-  claimWord(data, word) {
+  createWord(data, word) {
     let indices = this.checkCenterForWord([...word.toUpperCase()]);
     const player = this.players[data.playerId]
     if (indices !== false) {
       if (!player.words)
         player.words = []
-      player.words.push(word);
+      player.words.push(word.toUpperCase());
       player.score += word.length
       this.takeFromCenter(indices)
-      this.sendServerMessage(`Player: ${player.nickname} claimed the word: ${word}`)
+      this.sendServerMessage(`Player: ${player.nickname} made the word: ${word}`)
     } else {
       this.sendPrivateServerMessage(this.getSocket(data.playerId), 'That word can\'t be made!')
     }
+  }
+
+  stealWord(data, args) {
+    const oldWord = args[0].word
+    const newWord = args[1]
+    console.log("turning" + oldWord)
+    console.log("into" + newWord)
+    
   }
 
   handlePlayerMessage(data) {
@@ -112,8 +120,10 @@ class Room {
     switch(command) {
       case Constants.COMMANDS.FLIP:
         return this.flipTile(data)
-      case Constants.COMMANDS.CLAIM:
-        return this.claimWord(data, args[0])
+      case Constants.COMMANDS.CREATE_WORD:
+        return this.createWord(data, args[0])
+      case Constants.COMMANDS.STEAL_WORD:
+        return this.stealWord(data, args)
     }
   }
 

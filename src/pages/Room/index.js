@@ -12,7 +12,9 @@ export default class Room extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      loading: true
+      loading: true,
+      isModalOpen: true,
+      modalData: null
     }
   }
 
@@ -31,6 +33,31 @@ export default class Room extends Component {
     this.setState({loading: false, players: data.players, unflipped: data.unflippedCount, flipped: data.flipped})
   }
 
+  closeModal = () => {this.setState({isModalOpen: false, modalData: null, modalInput: null})}
+
+  updateInput = (e) => {
+    this.setState({ modalInput: e.target.value })
+  }
+
+  triggerSteal = (player) => {
+    let modalData = {
+      header: `Stealing word: ${player.word} from ${player.nickname}`,
+      prompt: `New word:`,
+      submit: (word)=>{triggerAction(socket, {command: Constants.COMMANDS.STEAL_WORD, args: [player, word]}); this.closeModal()}
+    }
+    this.setState({isModalOpen: true, modalData: modalData})
+  }
+
+  triggerCreate = () => {
+    console.warn("CREATING MODAL")
+    let modalData = {
+      header: `Creating Word`,
+      prompt: `New word:`,
+      submit: (word) => {triggerAction(socket, { command: Constants.COMMANDS.CREATE_WORD, args: [word]}); this.closeModal() }
+    }
+    this.setState({ isModalOpen: true, modalData: modalData })
+  }
+
   sendFlipCommand = () => {
     const { socket } = this.props
     if (!socket)
@@ -41,7 +68,7 @@ export default class Room extends Component {
   }
 
   render() {
-    const {loading, flipped, players, unflipped} = this.state
+    const {loading, flipped, players, unflipped, isModalOpen, modalData, modalInput} = this.state
     if (loading) {
       return (
         <div className="loading">
@@ -52,8 +79,18 @@ export default class Room extends Component {
     }
     return (
       <div id='room'>
+        {
+          isModalOpen && modalData != null &&
+            <div className="action-menu">
+              <h3>{modalData.header}</h3>
+              <p>{modalData.prompt}</p>
+              <input onChange={(e) => this.updateInput(e)}></input>
+              <button onClick={() => { modalData.submit(modalInput) }}>Submit</button>
+              <button onClick={this.closeModal}>Cancel</button>
+            </div>
+        }
         <div className="panel--left">
-          <Leaderboard players={players} unflipped={unflipped}/>
+          <Leaderboard players={players} unflipped={unflipped} steal={this.triggerSteal}/>
         </div>
         <div className="panel--right">
           <div id="letters--container">
@@ -66,7 +103,7 @@ export default class Room extends Component {
               })
             }
           </div>
-          <ControlPanel socket={socket}>
+          <ControlPanel socket={socket} create={this.triggerCreate}>
             <Chat socket={socket}/>
           </ControlPanel>
         </div>
