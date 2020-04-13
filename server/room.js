@@ -50,7 +50,7 @@ class Room {
     }
     
     return data;
-  }1
+  }
 
   getSocket(playerId) {return this.players[playerId].socket}
 

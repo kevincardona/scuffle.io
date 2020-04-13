@@ -1,7 +1,7 @@
 #chat {
-  max-width: 600px;
+  max-width: 37.5rem;
   background-color: white;
-  border-radius: 8px;
+  border-radius: 0.5rem;
 }
 
 #chat ul {
@@ -10,9 +10,9 @@
   align-items: flex-start;
   overflow-y: auto;
   overflow-x: wrap;
-  height: 300px;
+  height: 18.75rem;
   margin: 0px;
-  padding: 5px;
+  padding: 0.313rem;
   list-style-type: none;
 }
 
@@ -23,12 +23,12 @@ label {
 
 .message {
   width: 95%;
-  margin: 8px auto 3px auto;
+  margin: 0.5rem auto 0.188rem auto;
   overflow-wrap: anywhere;
 }
 
 .message__bubble {
-  padding: 5px 10px 5px 10px;
+  padding: 0.313rem 0.625rem 0.313rem 0.625rem;
   border-radius: 10px;
   background-color: rgb(161, 217, 255);
 }
@@ -53,12 +53,12 @@ label {
   }
 }
 
-@media screen and (max-width: 500px), screen and (max-height: 400px){
+@media screen and (max-width: 31.25rem), screen and (max-height: 25rem){
   #chat {
     border-radius: 0px;
   }
   #chat ul{
-    height: 200px;
+    height: 12.5rem;
   }
 }
 
