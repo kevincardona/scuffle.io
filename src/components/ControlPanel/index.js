@@ -20,8 +20,7 @@ export default class ControlPanel extends Component {
   }
 
   render () {
-    const {modalIsOpen} = this.state
-    const {children, socket, create} = this.props
+    const {children, create} = this.props
     return (
       <div className="container--center">
         <div id="control-panel">

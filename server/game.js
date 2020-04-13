@@ -31,7 +31,7 @@ class Game {
       playerId: socket.id,
       action: action
     }
-    this.getPlayerRoom(socket).handleCommand(data, action.command, action.args)
+    this.getPlayerRoom(socket).handlePlayerCommand(data, action.command, action.args)
   }
 
   leaveRoom(socket) {

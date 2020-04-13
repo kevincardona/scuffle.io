@@ -11,7 +11,7 @@ export default class Word extends Component {
   render () {
     const {word} = this.props
     return (
-      <div className="word">
+      <div {...this.props} className={"word " + this.props.className}>
         { 
           [...word].map(letter => <Tile letter={letter}/>)
         }

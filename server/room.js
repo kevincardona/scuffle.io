@@ -23,9 +23,6 @@ class Room {
     })
     this.unflipped = helpers.shuffle(this.unflipped)
     this.letterIndex = {}
-    this.unflipped.forEach((letter, index) => {
-
-    })
   }
   
   resetGame() {
@@ -128,7 +125,7 @@ class Room {
     if (indices !== false) {
       this.addWordToPlayer(data.playerId, word)
       this.takeFromCenter(indices)
-      this.sendServerMessage(`Player: ${player.nickname} made the word: ${word}`)
+      this.sendServerMessage(`${player.nickname} made the word: ${word}`)
     } else {
       this.sendPrivateServerMessage(this.getSocket(data.playerId), 'That word can\'t be made!')
     }
@@ -154,7 +151,7 @@ class Room {
     return word
   }
 
-  checkWordContainsOther(oldWord, newWordMap, oldWordMap) {
+  checkWordContainsOther(newWordMap, oldWordMap) {
     Object.keys(oldWordMap).forEach((letter) => {
       if (oldWordMap[letter] > newWordMap[letter]) {
         return false
@@ -175,7 +172,7 @@ class Room {
     if (!newWord || !oldWord) {
       return
     }
-    const difference = this.checkWordContainsOther(oldWord, this.getLetterMap(newWord), this.getLetterMap(oldWord))
+    const difference = this.checkWordContainsOther(this.getLetterMap(newWord), this.getLetterMap(oldWord))
     console.warn("DIFFERENCE")
     console.warn(difference)
     if (!difference) {
@@ -192,20 +189,20 @@ class Room {
     }
     this.removeWordFromPlayer(args[0].playerId, oldWord);
     this.addWordToPlayer(data.playerId, newWord);
-    this.sendServerMessage(`Player: ${this.players[data.playerId].nickname} stole the word: ${oldWord.toUpperCase()} to create: ${newWord.toUpperCase()}!!!`)
+    this.sendServerMessage(`${this.players[data.playerId].nickname} stole the word: ${oldWord.toUpperCase()} to create: ${newWord.toUpperCase()}!!!`)
 
   }
 
   handlePlayerMessage(data) {
     const commands = data.message.toUpperCase().split(' ')
     if (Constants.COMMANDS[commands[0].toUpperCase()]) {
-      this.handleCommand(data, commands[0], commands.slice(1))
+      this.handlePlayerCommand(data, commands[0], commands.slice(1))
     } else {
       this.sendMessage(data)
     }
   }
 
-  handleCommand(data, command, args) {
+  handlePlayerCommand(data, command, args) {
     switch(command) {
       case Constants.COMMANDS.FLIP:
         return this.flipTile(data)
@@ -259,7 +256,7 @@ class Room {
 
   removePlayer(socket) {
     if (this.players[socket.id])
-      this.sendServerMessage(`Player: ${this.players[socket.id].nickname} has left the room!`)
+      this.sendServerMessage(`${this.players[socket.id].nickname} has left the room!`)
     delete this.players[socket.id]
   }
 }

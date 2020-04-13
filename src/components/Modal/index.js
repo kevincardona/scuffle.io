@@ -12,7 +12,7 @@ const Modal = ({header, prompt, isOpen, close, submit, copy}) => {
 
   const onKeyPress = event => {
     if (event.key === 'Enter') {
-      submit();
+      submit(modalInput);
       close();
     }
   }
@@ -26,7 +26,7 @@ const Modal = ({header, prompt, isOpen, close, submit, copy}) => {
           <h3 className="modal__header">{header}</h3>
           {submit ?
             <div className="input-group">
-              <input type="text" className="form-control input-text modal__input--word" placeholder={prompt} onKeyPress={onKeyPress} onChange={e => setInput(e.target.value)} />
+              <input type="text" autoFocus className="form-control input-text modal__input--word" placeholder={prompt} onKeyPress={onKeyPress} onChange={e => setInput(e.target.value)} />
               <div className="input-group-append">
                 <button className="btn btn-primary input-group-btn" onClick={() => { submit(modalInput); close(); }}>Submit</button>
               </div>

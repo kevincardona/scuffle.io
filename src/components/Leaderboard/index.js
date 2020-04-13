@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import {Link} from 'react-router-dom';
 import Word from '../Word';
 import './leaderboard.scss';
 
@@ -33,11 +32,7 @@ export default class Leaderboard extends Component {
                   {
                     player.words && player.words.map((word)=> {
                       return (
-                        <div onClick={()=>steal({...player, word: word})}>
-                          <div className="smaller">
-                            <Word word={word}/>
-                          </div>
-                        </div>
+                        <Word className="smaller player__word" word={word} onClick={() => steal({ ...player, word: word })}/>
                       )
                     })
                   }
