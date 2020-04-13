@@ -8,14 +8,17 @@ export default class Leaderboard extends Component {
     this.state = {}
   }
   render() {
-    const {players, unflipped, steal, room, toggleInviteModal} = this.props
+    const {players, unflipped, steal, room, toggleInviteModal, toggleInfoModal} = this.props
     return (
       <div id="leaderboard">
         <div className="leaderboard__header">
           <h2>{room}</h2>
-          <button className="leaderboard__button--invite" onClick={toggleInviteModal}>INVITE FRIEND</button>
+          <div className="leaderboard__header--buttons">
+            <button className="leaderboard__button--invite" onClick={toggleInviteModal}>INVITE FRIEND</button>
+            <button className="leaderboard__button--help" onClick={toggleInfoModal}>HELP</button>
+          </div>
         </div>
-        <h4>UNFLIPPED TILES: {unflipped}</h4>
+        <h4>UNFLIPPED TILES: <span className="unflipped">{unflipped}</span></h4>
         <h4>PLAYERS</h4>
         {
           players && players.map((player)=>{
@@ -28,7 +31,7 @@ export default class Leaderboard extends Component {
                   POINTS: {player.score ? player.score : 0}
                 </div>
                 {!player.words && "NO WORDS"}
-                <div className="player--words">
+                <div className="player__words">
                   {
                     player.words && player.words.map((word)=> {
                       return (

@@ -69,12 +69,16 @@ export default class Chat extends Component {
                 case Constants.CHAT_MSG_TYPES.SERVER_MESSAGE:
                   return (
                     <li key={index} className="message">
-                      <label className="font-weight-bold">🎮:</label>
+                      <label className="font-weight-bold">
+                        <span role="img" aria-label="server-icon">🎮</span>:
+                      </label>
                       {" "}
                       <label className="message__bubble message__bubble--server-info">{data.message}</label>
                     </li>
                   )
+                default:
               }
+              return null
             })
           }
         </ul>

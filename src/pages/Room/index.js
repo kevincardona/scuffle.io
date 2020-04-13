@@ -44,6 +44,7 @@ export default class Room extends Component {
 
   triggerSteal = (player) => {
     let modalData = {
+      type: 'input',
       header: `Steal Word: ${player.word}`,
       prompt: `New Word`,
       submit: (word)=>{triggerAction(socket, {command: Constants.COMMANDS.STEAL_WORD, args: [player, word]});},
@@ -54,6 +55,7 @@ export default class Room extends Component {
 
   triggerCreate = () => {
     let modalData = {
+      type: 'input',
       header: `Create Word`,
       prompt: `New Word`,
       submit: (word) => {triggerAction(socket, { command: Constants.COMMANDS.CREATE_WORD, args: [word]});},
@@ -64,10 +66,19 @@ export default class Room extends Component {
 
   toggleInvite = () => {
     let modalData = {
+      type: 'invite',
       header: `Inviting a Friend`,
       prompt: `To invite a friend send them this link: `,
-      copy:  `http://scuffle.online/#/invite/${this.state.room}`,
+      copy:  `${window.location.host}/#/invite/${this.state.room}`,
       submit: null,
+      close: this.closeModal
+    }
+    this.setState({ isModalOpen: true, modalData: modalData })
+  }
+
+  toggleInfo = () => {
+    let modalData = {
+      type: 'info',
       close: this.closeModal
     }
     this.setState({ isModalOpen: true, modalData: modalData })
@@ -95,7 +106,14 @@ export default class Room extends Component {
     return (
       <div id='room'>
         <div className="panel--left">
-          <Leaderboard players={players} unflipped={unflipped} steal={this.triggerSteal} room={room} toggleInviteModal={this.toggleInvite}/>
+          <Leaderboard 
+            players={players} 
+            unflipped={unflipped} 
+            steal={this.triggerSteal} 
+            room={room} 
+            toggleInviteModal={this.toggleInvite} 
+            toggleInfoModal={this.toggleInfo}
+          />
         </div>
         <div className="panel--right">
           <Modal {...modalData} isOpen={isModalOpen} />
@@ -104,8 +122,9 @@ export default class Room extends Component {
               [...Array(Constants.GAME.TILE_COUNT)].map((e, i) => {
                 if (i < flipped.length)
                   return <Tile letter={flipped[i]}/>
-                if (i < flipped.length + 1)
+                if (i < flipped.length + 20)
                   return <Tile onClick={() => {triggerAction(socket, {command: Constants.COMMANDS.FLIP})}}/>
+                return null
               })
             }
           </div>

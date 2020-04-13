@@ -37,10 +37,12 @@ const Menu = (props) => {
         />
       }
       <div id="menu-buttons">
-        { (room && nickname) &&
+        { (room && nickname) ?
           <Link className="button--link" to={`/room/${room}?nick=${nickname}`}>
             <button type="button" className="btn btn-primary menu-button">PLAY</button>
           </Link>
+          :
+          <button type="button" className="btn btn-primary menu-button" disabled>PLAY</button>
         }
         <Link className="button--link" to={`/about`}>
           <button type="button" className="btn btn-secondary menu-button">RULES</button>

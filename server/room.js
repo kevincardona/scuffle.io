@@ -5,8 +5,8 @@ const checkWord = require('check-word'), words = checkWord('en');
 class Room {
   constructor(io, room) {
     this.room = room;
-    this.players = new Object();
-    this.playerOrder = new Array();
+    this.players = {};
+    this.playerOrder = [];
     this.flipped = new Array(Constants.GAME.TILE_COUNT)
     this.currentPlayer = null;
     this.io = io
@@ -70,18 +70,19 @@ class Room {
   }
 
   isValidWord(word) {
-    if (!word || word.length < 3)
+    if (word == null || word.length < 3)
       return false
-    return words.check(word)
+    return words.check(word.toLowerCase())
   }
 
-  checkCenterForWord(letters) {
+  checkCenterForWord(word) {
+    const letters = [...word];
     let foundLetters = {}
     for (const letter of letters) {
       let found = false
       for(let i = 0; i < this.flipped.length; i++) {
         const flippedLetter = this.flipped[i];
-        if (letter.toUpperCase() == flippedLetter.toUpperCase() && !foundLetters[i]) {
+        if (letter.toUpperCase() === flippedLetter.toUpperCase() && !foundLetters[i]) {
           foundLetters[i] = i;
           found = true;
           break
@@ -96,7 +97,7 @@ class Room {
 
   takeFromCenter(indices) {
     this.flipped = this.flipped.filter((_, index) => {
-      return indices[index] == undefined
+      return indices[index] === undefined
     })
   }
 
@@ -120,7 +121,7 @@ class Room {
     if (!this.isValidWord(word)) {
       return this.sendPrivateServerMessage(this.getSocket(data.playerId), 'That\'s an invalid word! Your word needs to be real and at least 3 characters long!')
     }
-    let indices = this.checkCenterForWord([...word.toUpperCase()]);
+    let indices = this.checkCenterForWord(word.toUpperCase());
     const player = this.players[data.playerId]
     if (indices !== false) {
       this.addWordToPlayer(data.playerId, word)
@@ -131,12 +132,45 @@ class Room {
     }
   }
 
+  stealWord(data, args) {
+    let oldWord = args[0].word.toUpperCase()
+    let newWord = args[1].toUpperCase()
+    const difference = this.checkWordContainsOther(this.getLetterMap(newWord), this.getLetterMap(oldWord))
+    if (!difference) {
+      return this.sendPrivateServerMessage(this.getSocket(data.playerId), `The word ${newWord} doesn't contain all of the letters from ${oldWord} + at least 1 from the center!!`);
+    }
+    if (!this.isValidWord(newWord)) {
+      return this.sendPrivateServerMessage(this.getSocket(data.playerId), 'That\'s an invalid word! Your word needs to be real and at least 3 characters long!')
+    }
+    const correctCenterPieces = this.checkCenterForWord(this.letterMapToWord(difference));
+    if (!correctCenterPieces) {
+      return this.sendPrivateServerMessage(this.getSocket(data.playerId), `The word ${newWord} contains some letters that aren't in the center!!`);
+    } else {
+      this.takeFromCenter(correctCenterPieces)
+    }
+    this.removeWordFromPlayer(args[0].playerId, oldWord);
+    this.addWordToPlayer(data.playerId, newWord);
+    this.sendServerMessage(`${this.players[data.playerId].nickname} stole the word: ${oldWord} to create: ${newWord}!!!`)
+
+  }
+
+  putBackWord(data, word) {
+    let player = this.players[data.playerId]
+    if (player.words.indexOf(word) !== -1) {
+      this.removeWordFromPlayer(data.playerId, word)
+      this.sendServerMessage(`${player.nickname} put ${word} back into the mix!`)
+      this.flipped = this.flipped.concat([...word])
+    } else {
+      return this.sendPrivateServerMessage(this.getSocket(data.playerId), `Failed to put back word ${word}! Are you sure that's not someone elses?`);
+    }
+  }
+
   getLetterMap(word) {
-    const letters = {}
+    let letters = {};
     for(let i = 0; i < word.length; i++) {
       if (!letters[word.charAt(i)])
         letters[word.charAt(i).toUpperCase()] = 0
-      letters[word.charAt(i).toUpperCase()]++;
+      letters[word.charAt(i).toUpperCase()] = letters[word.charAt(i).toUpperCase()] + 1;
     }
     return letters;
   }
@@ -152,50 +186,24 @@ class Room {
   }
 
   checkWordContainsOther(newWordMap, oldWordMap) {
-    Object.keys(oldWordMap).forEach((letter) => {
-      if (oldWordMap[letter] > newWordMap[letter]) {
+    const letters = Object.keys(oldWordMap);
+    for(let i = 0; i < letters.length; i++) {
+      let letter = letters[i];
+      if (!newWordMap[letter] || oldWordMap[letter] > newWordMap[letter]) {
         return false
-      } else if (oldWordMap[letter] == newWordMap[letter]) {
-        delete newWordMap[letter];
-      } else {
-        newWordMap[letter] -= oldWordMap[letter]
       }
-    })
+      newWordMap[letter] -= oldWordMap[letter]
+      if (newWordMap[letter] === 0)
+        delete newWordMap[letter];
+    }
     if (Object.keys(newWordMap).length === 0)
       return false
     return newWordMap
   }
 
-  stealWord(data, args) {
-    const oldWord = args[0].word
-    const newWord = args[1]
-    if (!newWord || !oldWord) {
-      return
-    }
-    const difference = this.checkWordContainsOther(this.getLetterMap(newWord), this.getLetterMap(oldWord))
-    console.warn("DIFFERENCE")
-    console.warn(difference)
-    if (!difference) {
-      return this.sendPrivateServerMessage(this.getSocket(data.playerId), `The word ${newWord} doesn't contain all of the letters from ${oldWord} + at least 1 from the center!!`);
-    }
-    if (!this.isValidWord(newWord)) {
-      return this.sendPrivateServerMessage(this.getSocket(data.playerId), 'That\'s an invalid word! Your word needs to be real and at least 3 characters long!')
-    }
-    const correctCenterPieces = this.checkCenterForWord(this.letterMapToWord(difference));
-    if (!correctCenterPieces) {
-      return this.sendPrivateServerMessage(this.getSocket(data.playerId), `The word ${newWord} contains some letters that aren't in the center!!`);
-    } else {
-      this.takeFromCenter(correctCenterPieces)
-    }
-    this.removeWordFromPlayer(args[0].playerId, oldWord);
-    this.addWordToPlayer(data.playerId, newWord);
-    this.sendServerMessage(`${this.players[data.playerId].nickname} stole the word: ${oldWord.toUpperCase()} to create: ${newWord.toUpperCase()}!!!`)
-
-  }
-
   handlePlayerMessage(data) {
-    const commands = data.message.toUpperCase().split(' ')
-    if (Constants.COMMANDS[commands[0].toUpperCase()]) {
+    if (data.message && data.message[0] === '/') {
+      const commands = data.message.slice(1,).toUpperCase().split(' ')
       this.handlePlayerCommand(data, commands[0], commands.slice(1))
     } else {
       this.sendMessage(data)
@@ -210,9 +218,21 @@ class Room {
         return this.createWord(data, args[0])
       case Constants.COMMANDS.STEAL_WORD:
         return this.stealWord(data, args)
+      case Constants.COMMANDS.PUT_BACK:
+        return this.putBackWord(data, args[0])
       case Constants.COMMANDS.RESET_GAME:
         return this.resetGame()
+      case Constants.COMMANDS.RULES:
+        return this.sendPrivateServerMessage(this.getSocket(data.playerId), Constants.SERVER_PROMPTS.RULES);
+      case Constants.COMMANDS.HELP:
+        return this.sendPrivateServerMessage(this.getSocket(data.playerId), Constants.SERVER_PROMPTS.COMMANDS);
+      default:
+        return this.sendPrivateServerMessage(this.getSocket(data.playerId), `Command not found!`);
     }
+  }
+
+  sendRules(data) {
+    this.sendPrivateServerMessage(this.getSocket(data.playerId), Constants.SERVER_PROMPTS.RULES);
   }
 
   sendPrivateServerMessage(socket, message) {
@@ -238,6 +258,8 @@ class Room {
         return this.io.in(this.room).emit(Constants.MSG_TYPES.MESSAGE, data) 
       case Constants.CHAT_MSG_TYPES.PLAYER_MESSAGE:
         return this.io.in(this.room).emit(Constants.MSG_TYPES.MESSAGE, data) 
+      default:
+        return
     }
   }
 

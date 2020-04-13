@@ -10,8 +10,8 @@ function Router() {
     <HashRouter>
       <Switch>
         <Route exact path='/room/:room' component={Room} />
-        <Route exact path={['/about']} component={Home} />
-        <Route exact path={['/invite/:room', '/menu', '*']} component={Menu} />
+        <Route exact path={['/invite/:room', '/play']} component={Menu} />
+        <Route exact path={['/about', '/home', '*']} component={Home} />
       </Switch>
     </HashRouter>
   );

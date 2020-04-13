@@ -10,7 +10,7 @@
 }
 
 .tile__letter {
-  font-size: 2.5rem;
+  font-size: 2.5em;
   line-height: 3.125rem;
 }
 
@@ -46,11 +46,12 @@
 
 @keyframes slidein {
   from {
-    transform: translateX(100vw);
+    opacity: 0.0;
+    transform: translateY(5px);
   }
-
   to {
-    transform: translateX(0px);
+    opacity: 1;
+    transform: translateY(0px);
 
   }
 }

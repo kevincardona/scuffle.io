@@ -25,37 +25,36 @@
   &--right {
     position: absolute;
     right: 0%;
-    width: 70vw;
+    width: 65vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
 
   }
   &--left {
     position: absolute;
     left: 0%;
-    width: 30vw;
+    width: 35vw;
   }
 }
 
 
 #letters--container {
+  position: relative;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  justify-content: left;
+  justify-content: center;
   align-content: flex-start;
   overflow: auto;
   width: 90%;
-  height: 100vh;
+  height: 100%;
   max-width: 600px;
-  max-height: calc(100% - 433px);
   padding-top: 15px;
   margin: auto;
 }
 
 @media screen and (max-width: 500px), screen and (max-height: 400px) {
-  #letters--container {
-    max-height: calc(100% - 305px);
-  }
-
   .panel {
   &--right {
     position: absolute;

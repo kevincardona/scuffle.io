@@ -23,11 +23,10 @@
       color: white;
       margin-bottom: 20px;
     }
+    &--help {
+      border-radius: 5px;
+    }
   }
-}
-
-.small {
-  transform: scale(0.5);
 }
 
 .player {
@@ -38,8 +37,13 @@
     font-weight: bold;
   }
   &__word {
-    width: 40%;
     flex-grow: 1;
+    transform: scale(0.5);
+  }
+  &__words {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
   }
 }
 
