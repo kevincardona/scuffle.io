@@ -1,5 +1,7 @@
 const Constants = require('../src/constants');
 const Room = require('./room');
+const { loggers } = require('winston')
+const logger = loggers.get('main-logger')
 
 class Game {
   constructor(io) {
@@ -38,11 +40,18 @@ class Game {
     const room = this.getPlayerRoom(socket)
     if (room) {
       room.removePlayer(socket)
-      socket.leave(room.room)
+      socket.leave(room.id)
+      if (room.playerCount === 0) {
+        this.rooms[room.id] = null
+        room.destroy()
+        delete this.rooms[room.id]
+      }
     }
   }
 
   addPlayer(socket, nickname, room) {
+    if (this.players[socket.id])
+      return;
     if (this.rooms[room]) {
       this.rooms[room].addPlayer(socket, nickname)
     } else {

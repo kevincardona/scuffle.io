@@ -4,6 +4,7 @@
   background-color: rgb(24, 24, 24);
   overflow: hidden;
   overscroll-behavior: none;
+  display: flex;
 }
 
 .page {
@@ -23,7 +24,7 @@
 
 .panel {
   &--right {
-    position: absolute;
+    position: relative;
     right: 0%;
     width: 65vw;
     height: 100vh;
@@ -32,7 +33,7 @@
 
   }
   &--left {
-    position: absolute;
+    position: relative;
     left: 0%;
     width: 35vw;
   }
@@ -55,21 +56,19 @@
 }
 
 @media screen and (max-width: 500px), screen and (max-height: 400px) {
+  #room {
+    overflow: hidden;
+  }
   .panel {
-  &--right {
-    position: absolute;
-    bottom: 0%;
-    width: 100vw;
-    height: 80vh;
-
+    &--right {
+      width: 50vw;
+      height: 60vh;
+    }
+    &--left {
+      width: 50vw;
+      height: 60vh;
+    }
   }
-  &--left {
-    position: absolute;
-    top: 0%;
-    width: 100vw;
-    height: 20vh;
-  }
-}
 }
 
 #letters--container::-webkit-scrollbar {

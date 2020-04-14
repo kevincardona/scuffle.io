@@ -1,7 +1,11 @@
 #chat {
+  height: 1vh;
   max-width: 37.5rem;
   background-color: white;
   border-radius: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 #chat ul {
@@ -10,7 +14,7 @@
   align-items: flex-start;
   overflow-y: auto;
   overflow-x: wrap;
-  height: 10rem;
+  height: 100%;
   margin: 0px;
   padding: 0.313rem;
   list-style-type: none;
@@ -47,6 +51,7 @@ label {
 
 .chat {
   &__input {
+    margin-bottom: auto;
     &--message {
       height: auto;
     }
@@ -58,7 +63,6 @@ label {
     border-radius: 0px;
   }
   #chat ul{
-    height: 5rem;
   }
 }
 

@@ -22,19 +22,19 @@ export default class ControlPanel extends Component {
   render () {
     const {children, create} = this.props
     return (
-      <div className="container--center">
-        <div id="control-panel">
-          <div id="control-panel__buttons">
-            <button className="control__button control__button--flip" onClick={this.sendFlip}>
-              Flip
-            </button>
-            <button className="control__button control__button--create" onClick={create}>
-              Create Word
-            </button>
-          </div>
-          {children}
+    <div id="control-panel__container">
+      <div id="control-panel">
+        <div id="control-panel__buttons">
+          <button className="control__button control__button--flip" onClick={this.sendFlip}>
+            Flip
+          </button>
+          <button className="control__button control__button--create" onClick={create}>
+            Create Word
+          </button>
         </div>
+        {children}
       </div>
+    </div>
     )
   }
 }

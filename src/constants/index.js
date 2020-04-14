@@ -2,7 +2,7 @@ module.exports = Object.freeze({
     COMMANDS: {
       FLIP: 'FLIP',
       CREATE_WORD: 'CREATE_WORD',
-      OVERRIDE_WORD: 'OVERRIDE_WORD',
+      OVERRIDE: 'OVERRIDE',
       PUT_BACK: 'PUT_BACK',
       STEAL_WORD: 'STEAL_WORD',
       RESET_GAME: 'RESET_GAME',

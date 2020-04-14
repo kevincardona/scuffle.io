@@ -32,11 +32,11 @@ export default class Room extends Component {
 
   updateRoom = (data) => {
     this.setState({
-      loading: false, 
-      players: data.players, 
-      unflipped: data.unflippedCount, 
+      loading: false,
+      players: data.players,
+      unflipped: data.unflippedCount,
       flipped: data.flipped,
-      room: data.room
+      room: data.room,
     })
   }
 
@@ -69,7 +69,7 @@ export default class Room extends Component {
       type: 'invite',
       header: `Inviting a Friend`,
       prompt: `To invite a friend send them this link: `,
-      copy:  `${window.location.host}/#/invite/${this.state.room}`,
+      copy:  `https://${window.location.host}/#/invite/${this.state.room}`,
       submit: null,
       close: this.closeModal
     }
@@ -119,11 +119,11 @@ export default class Room extends Component {
           <Modal {...modalData} isOpen={isModalOpen} />
           <div id="letters--container">
             {
-              [...Array(Constants.GAME.TILE_COUNT)].map((e, i) => {
+              [...Array(Constants.GAME.TILE_COUNT)].map((_, i) => {
                 if (i < flipped.length)
-                  return <Tile letter={flipped[i]}/>
+                  return <Tile key={i} letter={flipped[i]}/>
                 if (i < flipped.length + 20)
-                  return <Tile onClick={() => {triggerAction(socket, {command: Constants.COMMANDS.FLIP})}}/>
+                  return <Tile key={i} onClick={() => {triggerAction(socket, {command: Constants.COMMANDS.FLIP})}}/>
                 return null
               })
             }

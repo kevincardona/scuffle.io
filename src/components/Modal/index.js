@@ -5,6 +5,7 @@ import './modal.scss'
 const Modal = ({header, type, prompt, isOpen, close, submit, copy}) => {
   const [modalInput, setInput] = useState('');
   const [isModalOpen, setOpenState] = useState(false)
+  const [page, setPage] = useState(1)
   const [copyState, setCopied] = useState('Click to Copy')
   useEffect(()=>{
     setOpenState(isOpen);
@@ -22,7 +23,7 @@ const Modal = ({header, type, prompt, isOpen, close, submit, copy}) => {
     {
       isModalOpen ?
         <div className="modal">
-          <button className="modal__button--close" onClick={close}>X</button>
+          <button className="modal__button--close" onClick={()=>{close();setPage(1)}}>X</button>
           <h3 className="modal__header">{header}</h3>
           {type === 'input' &&
             <Fragment>
@@ -50,15 +51,36 @@ const Modal = ({header, type, prompt, isOpen, close, submit, copy}) => {
           }
           {type === 'info' &&
             <div>
-              <h4>Help</h4>
-              <p>
-                If you're reading this you must be confused...
-                <br/><br/>
-                To read the rules type <b>/rules</b> in chat.<br/>          
-                (don't worry noone else will see)
-                <br/><br/>
-                To see the other commands type <b>/help</b>
-              </p>
+              { page === 1 &&
+              <Fragment>
+                <h4>Help</h4>
+                <p>
+                  If you're reading this you must be confused...
+                  <br/><br/>
+                  To read the rules type <b>/rules</b> in chat.<br/>          
+                  (don't worry noone else will see)
+                  <br/><br/>
+                </p>
+              </Fragment>
+              }
+              { page === 2 &&
+              <Fragment>
+                <h5>Commands</h5>
+                <br/>
+                <p>
+                  To reset the game type <b>/reset_game</b>
+                  <br/><br/>
+                  To put one of your words back type <b>/put_back {"<word>"}</b>
+                  <br/><br/>
+                  To override an invalid word type <b>/override {"<word>"}</b>
+                  <br/><br/>
+                </p>
+              </Fragment>
+              }
+              {page} of 2
+              <br/>
+              { page > 1 && <button onClick={()=>setPage(page - 1)}>{"<"}</button> }
+              { page < 2 && <button onClick={()=>setPage(page + 1)}>{">"}</button> }
             </div>
           }
         </div>

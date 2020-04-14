@@ -1,17 +1,31 @@
 const Constants = require('../src/constants');
 const helpers = require('./utils/helpers');
 const checkWord = require('check-word'), words = checkWord('en');
+const { loggers } = require('winston');
+const logger = loggers.get('main-logger');
 
 class Room {
-  constructor(io, room) {
-    this.room = room;
+  constructor(io, id) {
+    this.id = id;
+    this.playerCount = 0
     this.players = {};
-    this.playerOrder = [];
+    this.overrides = {}
     this.flipped = new Array(Constants.GAME.TILE_COUNT)
     this.currentPlayer = null;
     this.io = io
-    setInterval(this.update.bind(this), 250);
+    this.updateInterval = setInterval(this.update.bind(this), 250);
     this.generateTable()
+  }
+
+  destroy() {
+    clearInterval(this.updateInterval)
+    delete this.id
+    delete this.playerCount
+    delete this.players
+    delete this.overrides
+    delete this.flipped
+    delete this.currentPlayer
+    delete this
   }
 
   generateTable() {
@@ -43,7 +57,7 @@ class Room {
       }
     })
     const data = {
-      room: this.room,
+      room: this.id,
       unflippedCount: this.unflipped.length,
       flipped: this.flipped,
       players: players
@@ -56,7 +70,7 @@ class Room {
 
   update() {
     const currentPlayer = this.getRoomData()
-    this.io.in(this.room).emit(Constants.MSG_TYPES.GAME_UPDATE, currentPlayer)    
+    this.io.in(this.id).emit(Constants.MSG_TYPES.GAME_UPDATE, currentPlayer)    
   }
 
   flipTile(data) {
@@ -70,9 +84,15 @@ class Room {
   }
 
   isValidWord(word) {
-    if (word == null || word.length < 3)
+    word = word.toLowerCase()
+    if ((word == null || word.length < 3) && this.overrides[word] == null)
       return false
-    return words.check(word.toLowerCase())
+    return words.check(word.toLowerCase()) || this.overrides[word] != null
+  }
+
+  overrideWord(data, word) {
+    this.overrides[word.toLowerCase()] = true
+    this.sendServerMessage(`${this.players[data.playerId].nickname} has added the word: ${word} to the dictionary!`)
   }
 
   checkCenterForWord(word) {
@@ -140,7 +160,7 @@ class Room {
       return this.sendPrivateServerMessage(this.getSocket(data.playerId), `The word ${newWord} doesn't contain all of the letters from ${oldWord} + at least 1 from the center!!`);
     }
     if (!this.isValidWord(newWord)) {
-      return this.sendPrivateServerMessage(this.getSocket(data.playerId), 'That\'s an invalid word! Your word needs to be real and at least 3 characters long!')
+      return this.sendPrivateServerMessage(this.getSocket(data.playerId), 'That\'s an invalid word! Your word needs to be real and at least 3 characters long! If you would like to add this word to the dictionary type /OVERRIDE <word>')
     }
     const correctCenterPieces = this.checkCenterForWord(this.letterMapToWord(difference));
     if (!correctCenterPieces) {
@@ -220,6 +240,8 @@ class Room {
         return this.stealWord(data, args)
       case Constants.COMMANDS.PUT_BACK:
         return this.putBackWord(data, args[0])
+      case Constants.COMMANDS.OVERRIDE:
+        return this.overrideWord(data, args[0])
       case Constants.COMMANDS.RESET_GAME:
         return this.resetGame()
       case Constants.COMMANDS.RULES:
@@ -255,31 +277,32 @@ class Room {
   sendMessage(data) {
     switch (data.type) {
       case Constants.CHAT_MSG_TYPES.SERVER_MESSAGE:
-        return this.io.in(this.room).emit(Constants.MSG_TYPES.MESSAGE, data) 
+        return this.io.in(this.id).emit(Constants.MSG_TYPES.MESSAGE, data) 
       case Constants.CHAT_MSG_TYPES.PLAYER_MESSAGE:
-        return this.io.in(this.room).emit(Constants.MSG_TYPES.MESSAGE, data) 
+        return this.io.in(this.id).emit(Constants.MSG_TYPES.MESSAGE, data) 
       default:
         return
     }
   }
 
   addPlayer(socket, nickname) {
+    logger.debug(`Adding player ${nickname} to room ${this.id}`)
     this.players[socket.id] = {
       socket: socket,
       playerId: socket.id,
       nickname: nickname,
       score: 0
     }
-    if (!this.currentPlayer)
-      this.currentPlayer = socket.id;
-    this.playerOrder.push(socket.id);
     this.sendServerMessage(`${nickname} has joined the room!`)
+    this.playerCount = this.playerCount + 1
   }
 
   removePlayer(socket) {
-    if (this.players[socket.id])
+    if (this.players[socket.id]) {
       this.sendServerMessage(`${this.players[socket.id].nickname} has left the room!`)
-    delete this.players[socket.id]
+      delete this.players[socket.id]
+      this.playerCount = this.playerCount - 1
+    }
   }
 }
 

@@ -5,8 +5,22 @@ const Constants = require('../src/constants');
 const Game = require('./game');
 const app = express();
 const port = process.env.PORT || 3001;
+const winston = require('winston')
+winston.loggers.add('main-logger', winston.createLogger({
+  level: 'info',
+  format: winston.format.json(),
+  defaultMeta: { service: 'user-service' },
+  transports: [
+    new winston.transports.File({ filename: 'error.log', level: 'error' }),
+    new winston.transports.File({ filename: 'combined.log' })
+  ]
+}))
+const logger = winston.loggers.get('main-logger')
 
-if (process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV !== 'production') {
+  logger.add(new winston.transports.Console({
+    format: winston.format.simple()
+  }));
   app.use(express.static(path.join(__dirname, '../build')));
 } else {
   console.log("Starting production server...")
@@ -19,7 +33,7 @@ const server = app.listen(port, () => {
 
 const io = socketio(server);
 io.on('connection', socket => {
-  console.log('Player connected!', socket.id);
+  logger.info(`Player connected: ${socket.id}`)
   socket.on(Constants.MSG_TYPES.LEAVE_ROOM, leaveRoom);
   socket.on(Constants.MSG_TYPES.JOIN_ROOM, joinRoom);
   socket.on(Constants.MSG_TYPES.MESSAGE, handlePlayerMessage)
@@ -43,7 +57,6 @@ function handlePlayerMessage(message) {
 }
 
 function handlePlayerAction(action) {
-  console.log(`Handling player action: ${action}`)
   game.handlePlayerAction(this, action);
 }
 

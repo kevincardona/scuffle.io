@@ -13,7 +13,7 @@ export default class Word extends Component {
     return (
       <div {...this.props} className={"word " + this.props.className}>
         { 
-          [...word].map(letter => <Tile letter={letter}/>)
+          [...word].map((letter, index) => <Tile key={index} letter={letter}/>)
         }
       </div>
     )

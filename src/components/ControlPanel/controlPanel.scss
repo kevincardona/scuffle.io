@@ -1,20 +1,25 @@
-.container--center {
-  position: relative;
-  right: 0;
-  bottom: 0;
-  width: 100%;
-}
-
 #control-panel {
   position: relative;
   max-width: 37.5rem;
-  margin: auto;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
   &__buttons {
     margin: 0.625rem 0 0.625rem 0;
     width: 100%;
     display: flex;
     justify-content: center;
   }
+  &__container {
+    height: 40vh;
+    width: 100%;
+    max-width: 37.5rem;
+    margin: auto;
+  }
+}
+
+.control-panel__buttons {
+  height: 10vh;
 }
 
 .control__button {
@@ -63,4 +68,14 @@
 
 .control__button:focus {
   outline: none;
+}
+
+@media screen and (max-width: 31.25rem), screen and (max-height: 25rem){
+  #control-panel__container {
+    position: fixed;
+    width: 100vw;
+    height: 40vh;
+    bottom: 0%;
+    left: 0%;
+  }
 }

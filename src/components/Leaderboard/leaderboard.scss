@@ -1,11 +1,11 @@
 #leaderboard {
   width: 100%;
-  height: 100vh;
+  height: 100%;
   padding: 20px;
   background-color: #424344;
   color: white;
-  overflow-y: auto;
   text-align: center;
+  flex-direction: column;
 }
 
 .leaderboard {
@@ -14,22 +14,46 @@
     height: auto;
     overflow: hidden;
     border-bottom: solid 2px gray;
-    margin-bottom: 30px;
+    min-height: 128px;
+    padding: 10px;
+
+    &--buttons {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      flex-wrap: wrap-reverse;
+      margin-bottom: 10px;
+    }
   }
   &__button {
     &--invite {
       background-color: rgb(94, 94, 94);
       border-radius: 5px;
       color: white;
-      margin-bottom: 20px;
+      height: 1.875rem;
     }
     &--help {
       border-radius: 5px;
+      height: 1.875rem;
+    }
+  }
+
+  &__info {
+    &--unflipped {
+      font-size: 1em;
+      border-bottom: solid 2px gray;
+    }
+  }
+
+  &__players {
+    &--words {
+      height: 100%;
     }
   }
 }
 
 .player {
+  height: 100%;
   margin-bottom: 30px;
   &--name {
     color: darkgray;
@@ -50,6 +74,6 @@
 @media screen and (max-width: 500px), screen and (max-height: 400px) {
   #leaderboard {
     padding: 3px;
-    height: 100%;
+    overflow-y: auto;
   }
 }

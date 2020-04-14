@@ -1,8 +1,9 @@
-import React, {Component} from 'react';
+import React, {PureComponent} from 'react';
+import {socket} from '../../util/api';
 import Word from '../Word';
 import './leaderboard.scss';
 
-export default class Leaderboard extends Component {
+export default class Leaderboard extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {}
@@ -18,32 +19,49 @@ export default class Leaderboard extends Component {
             <button className="leaderboard__button--help" onClick={toggleInfoModal}>HELP</button>
           </div>
         </div>
-        <h4>UNFLIPPED TILES: <span className="unflipped">{unflipped}</span></h4>
-        <h4>PLAYERS</h4>
-        {
-          players && players.map((player)=>{
-            return (
-              <div className="player">
-                <div className="player--name">
-                  {player.nickname}
+        <h5 className="leaderboard__info--unflipped">UNFLIPPED TILES: <span className="unflipped">{unflipped}</span></h5>
+        <div className="leaderboard__players">
+          <h4 className="leaderboard__players--header">
+            PLAYERS
+          </h4>
+          <div className="leaderboard__players--words">
+          {
+            players && players
+              .sort((a, b)=>{
+                console.log(socket.id)
+                if (b.playerId === socket.id)
+                  return 1;
+                if (a.score > b.score)
+                  return -1;
+                if (b.score > a.score)
+                  return 1;
+                return 0;
+              })
+              .map((player, index)=>{
+              return (
+                <div key={index} className="player">
+                  <div className="player--name">
+                    {player.nickname}
+                  </div>
+                  <div className="player--score">
+                    POINTS: {player.score ? player.score : 0}
+                  </div>
+                  {!player.words && "NO WORDS"}
+                  <div className="player__words">
+                    {
+                      player.words && player.words.map((word, index)=> {
+                        return (
+                          <Word key={index} className="smaller player__word" word={word} onClick={() => steal({ ...player, word: word })}/>
+                        )
+                      })
+                    }
+                  </div>
                 </div>
-                <div className="player--score">
-                  POINTS: {player.score ? player.score : 0}
-                </div>
-                {!player.words && "NO WORDS"}
-                <div className="player__words">
-                  {
-                    player.words && player.words.map((word)=> {
-                      return (
-                        <Word className="smaller player__word" word={word} onClick={() => steal({ ...player, word: word })}/>
-                      )
-                    })
-                  }
-                </div>
-              </div>
-            )
-          })
-        }
+              )
+            })
+          }
+          </div>
+        </div>
       </div>
     )
   }
