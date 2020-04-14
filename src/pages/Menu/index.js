@@ -30,7 +30,7 @@ const Menu = (props) => {
           type="text" 
           className="input-group-text mb-2" 
           id="room-input" 
-          placeholder="Enter Room Code" 
+          placeholder="Room Name" 
           value={room || ''} 
           disabled={disabled}
           onChange={e => setRoom(e.target.value)} 

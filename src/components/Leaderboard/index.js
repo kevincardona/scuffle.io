@@ -1,5 +1,4 @@
 import React, {PureComponent} from 'react';
-import {socket} from '../../util/api';
 import Word from '../Word';
 import './leaderboard.scss';
 
@@ -9,7 +8,7 @@ export default class Leaderboard extends PureComponent {
     this.state = {}
   }
   render() {
-    const {players, unflipped, steal, room, toggleInviteModal, toggleInfoModal} = this.props
+    const {socket, players, unflipped, steal, room, toggleInviteModal, toggleInfoModal} = this.props
     return (
       <div id="leaderboard">
         <div className="leaderboard__header">
@@ -20,10 +19,11 @@ export default class Leaderboard extends PureComponent {
           </div>
         </div>
         <h5 className="leaderboard__info--unflipped">UNFLIPPED TILES: <span className="unflipped">{unflipped}</span></h5>
+        <h4 className="leaderboard__players--header">
+          PLAYERS
+        </h4>
+        <div className="leaderboard__players--container">
         <div className="leaderboard__players">
-          <h4 className="leaderboard__players--header">
-            PLAYERS
-          </h4>
           <div className="leaderboard__players--words">
           {
             players && players
@@ -61,6 +61,7 @@ export default class Leaderboard extends PureComponent {
             })
           }
           </div>
+        </div>
         </div>
       </div>
     )

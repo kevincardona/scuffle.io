@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
-import {socket, joinRoom, leaveRoom, triggerAction} from '../../util/api';
+import {getSocket, joinRoom, leaveRoom, triggerAction} from '../../util/api';
 import Constants from '../../constants';
-import Loader from '../../assets/loader.svg';
 import ControlPanel from '../../components/ControlPanel';
 import Leaderboard from '../../components/Leaderboard';
 import Chat from '../../components/Chat';
@@ -15,19 +14,23 @@ export default class Room extends Component {
     this.state = {
       loading: true,
       isModalOpen: false,
-      modalData: null
+      modalData: null,
+      socket: null
     }
   }
 
   componentDidMount() {
     const {room} = this.props.match?.params
     const urlParams = new URLSearchParams(this.props.location.search)
+    const socket = getSocket()
+    this.setState({socket: socket})
     joinRoom(socket, room, urlParams.get('nick'))
     socket.on(Constants.MSG_TYPES.GAME_UPDATE, this.updateRoom)
   }
 
   componentWillUnmount() {
-    leaveRoom(socket)
+    const {socket} = this.state
+    socket.close()
   }
 
   updateRoom = (data) => {
@@ -43,6 +46,7 @@ export default class Room extends Component {
   closeModal = () => { this.setState({ isModalOpen: false, modalData: null }) }
 
   triggerSteal = (player) => {
+    const {socket} = this.state
     let modalData = {
       type: 'input',
       header: `Steal Word: ${player.word}`,
@@ -54,6 +58,7 @@ export default class Room extends Component {
   }
 
   triggerCreate = () => {
+    const {socket} = this.state
     let modalData = {
       type: 'input',
       header: `Create Word`,
@@ -85,7 +90,7 @@ export default class Room extends Component {
   }
 
   sendFlipCommand = () => {
-    const { socket } = this.props
+    const {socket} = this.state
     if (!socket)
       return
     triggerAction(socket, {
@@ -94,12 +99,12 @@ export default class Room extends Component {
   }
 
   render() {
-    const {loading, flipped, players, unflipped, room, isModalOpen, modalData} = this.state
+    const {socket, loading, flipped, players, unflipped, room, isModalOpen, modalData} = this.state
     if (loading) {
       return (
         <div className="loading">
           <h3 className="text-muted font-weight-bold">LOADING</h3>
-          <object type="image/svg+xml" className="loader" data={Loader} aria-label="Loading..."/>
+          <object type="image/svg+xml" className="loader" data={process.env.PUBLIC_URL + 'loader.svg'} aria-label="Loading..."/>
         </div> 
       )
     }
@@ -107,6 +112,7 @@ export default class Room extends Component {
       <div id='room'>
         <div className="panel--left">
           <Leaderboard 
+            socket={socket}
             players={players} 
             unflipped={unflipped} 
             steal={this.triggerSteal} 

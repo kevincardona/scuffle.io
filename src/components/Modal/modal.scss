@@ -25,6 +25,10 @@
     }
   }
 
+  &__command {
+    white-space: nowrap;
+  }
+
   &__input{
     &--word {
       height: auto;

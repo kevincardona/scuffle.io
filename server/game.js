@@ -40,18 +40,20 @@ class Game {
     const room = this.getPlayerRoom(socket)
     if (room) {
       room.removePlayer(socket)
-      socket.leave(room.id)
-      if (room.playerCount === 0) {
-        this.rooms[room.id] = null
-        room.destroy()
-        delete this.rooms[room.id]
-      }
+      socket.leave(room.id, () => {
+        if (room.playerCount === 0) {
+          this.rooms[room.id] = null
+          room.destroy()
+          delete this.rooms[room.id]
+        }
+      })
     }
   }
 
   addPlayer(socket, nickname, room) {
+    console.log(socket.id)
     if (this.players[socket.id])
-      return;
+      return this.rooms[room].addPlayer(socket, nickname)
     if (this.rooms[room]) {
       this.rooms[room].addPlayer(socket, nickname)
     } else {

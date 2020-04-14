@@ -46,8 +46,13 @@
   }
 
   &__players {
+    overflow-y: auto;
+    height: 100%;
     &--words {
-      height: 100%;
+      margin-bottom: 10px;
+    }
+    &--container {
+      height: 80vh;
     }
   }
 }

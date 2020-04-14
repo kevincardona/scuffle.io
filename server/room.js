@@ -83,11 +83,17 @@ class Room {
 
   }
 
-  isValidWord(word) {
+  isValidWord(word, data) {
     word = word.toLowerCase()
-    if ((word == null || word.length < 3) && this.overrides[word] == null)
+    if ((word == null || word.length < 3) && this.overrides[word] == null) {
+      if (data)
+        this.sendPrivateServerMessage(this.getSocket(data.playerId), 'Your word needs to be real and at least 3 characters long!')
       return false
-    return words.check(word.toLowerCase()) || this.overrides[word] != null
+    }
+    if (words.check(word.toLowerCase()) || this.overrides[word] != null)
+      return true
+    this.sendPrivateServerMessage(this.getSocket(data.playerId), 'That\'s not a real word! To allow this word type /override word')
+    return false
   }
 
   overrideWord(data, word) {
@@ -138,9 +144,7 @@ class Room {
   }
 
   createWord(data, word) {
-    if (!this.isValidWord(word)) {
-      return this.sendPrivateServerMessage(this.getSocket(data.playerId), 'That\'s an invalid word! Your word needs to be real and at least 3 characters long!')
-    }
+    if (!this.isValidWord(word, data)) {return}
     let indices = this.checkCenterForWord(word.toUpperCase());
     const player = this.players[data.playerId]
     if (indices !== false) {
@@ -159,9 +163,7 @@ class Room {
     if (!difference) {
       return this.sendPrivateServerMessage(this.getSocket(data.playerId), `The word ${newWord} doesn't contain all of the letters from ${oldWord} + at least 1 from the center!!`);
     }
-    if (!this.isValidWord(newWord)) {
-      return this.sendPrivateServerMessage(this.getSocket(data.playerId), 'That\'s an invalid word! Your word needs to be real and at least 3 characters long! If you would like to add this word to the dictionary type /OVERRIDE <word>')
-    }
+    if (!this.isValidWord(newWord, data)) {return}
     const correctCenterPieces = this.checkCenterForWord(this.letterMapToWord(difference));
     if (!correctCenterPieces) {
       return this.sendPrivateServerMessage(this.getSocket(data.playerId), `The word ${newWord} contains some letters that aren't in the center!!`);
@@ -297,11 +299,17 @@ class Room {
     this.playerCount = this.playerCount + 1
   }
 
-  removePlayer(socket) {
+  removePlayer(socket, callback) {
     if (this.players[socket.id]) {
+      this.players[socket.id].status = 'disconnected'
       this.sendServerMessage(`${this.players[socket.id].nickname} has left the room!`)
-      delete this.players[socket.id]
-      this.playerCount = this.playerCount - 1
+      setTimeout(() => {
+        if (!this.players[socket.id]) return;
+        if (this.players[socket.id].status !== 'connected') {
+          delete this.players[socket.id]
+          this.playerCount = this.playerCount - 1
+        }
+      }, 30000);
     }
   }
 }

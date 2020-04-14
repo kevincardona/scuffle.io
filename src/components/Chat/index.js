@@ -1,5 +1,5 @@
 import React, {Component, Fragment} from 'react';
-import { socket, sendMessage, getSocketId } from '../../util/api';
+import {sendMessage} from '../../util/api';
 import Constants from '../../constants';
 import './chat.scss';
 
@@ -15,6 +15,7 @@ export default class Chat extends Component {
   }
 
   componentDidMount() {
+    const {socket} = this.props;
     socket.on(Constants.MSG_TYPES.MESSAGE, (message) => {
       this.getMessage(message);
       if (this.messageRef.current)
@@ -31,6 +32,7 @@ export default class Chat extends Component {
   }
 
   send = (event) => {
+    const {socket} = this.props
     if (event)
       event.preventDefault();
     if (this.state.input)
@@ -46,6 +48,7 @@ export default class Chat extends Component {
 
   render() {
     const {input, messages} = this.state
+    const {socket} = this.props
     return (
       <div id="chat">
         <ul id="messages" ref={this.messageRef}>
@@ -55,7 +58,7 @@ export default class Chat extends Component {
                 case Constants.CHAT_MSG_TYPES.PLAYER_MESSAGE:
                   return (
                     <li key={index} className="message">
-                      { data.playerId === getSocketId() ?
+                      { data.playerId === socket?.id ?
                         <label className="message__bubble message__bubble--player-current">{data.message}</label>
                         :
                         <Fragment>

@@ -1,27 +1,22 @@
 import io from 'socket.io-client';
 import Constants from '../constants';
 
-const protocol = (window.location.protocol.includes('https')) ? 'wss' : 'ws';
-export const socket = io(`${protocol}://${window.location.host}`, { reconnection: false });
-
-const connectedPromise = new Promise(resolve => {
-  socket.on('connect', () => {
-    console.log('Connected to server!');
-    resolve();
-  });
-})
-
-export const getSocketId = () => {
-  return socket.id
-}
-
-export const connect = onClose => (
+export const getSocket = () => {
+  const protocol = (window.location.protocol.includes('https')) ? 'wss' : 'ws';
+  const socket = io(`${protocol}://${window.location.host}`, { reconnection: true });
+  const connectedPromise = new Promise(resolve => {
+    socket.on('connect', () => {
+      console.log('Connected to server!');
+      resolve();
+    });
+  })
   connectedPromise.then(() => {
     socket.on('disconnect', () => {
       console.log('Disconnected from server.');
     });
   })
-)
+  return socket
+}
 
 export const triggerAction = (socket, action) => {
   socket.emit(Constants.MSG_TYPES.PLAYER_ACTION, action)
