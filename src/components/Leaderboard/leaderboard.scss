@@ -31,6 +31,7 @@
       border-radius: 5px;
       color: white;
       height: 1.875rem;
+      overflow: hidden;
     }
     &--help {
       border-radius: 5px;
@@ -72,7 +73,7 @@
   &__words {
     display: flex;
     flex-wrap: wrap;
-    justify-content: flex-start;
+    justify-content: center;
   }
 }
 

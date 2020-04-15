@@ -10,6 +10,67 @@ function shuffle(array) {
     return array;
 }
 
+const letterCountMap = (word) => {
+  let letters = {};
+  for(let i = 0; i < word.length; i++) {
+    const currentLetter = word.charAt(i).toUpperCase()
+    if (!letters[currentLetter])
+      letters[currentLetter] = 0
+    letters[currentLetter] = letters[currentLetter] + 1;
+  }
+  return letters;
+}
+
+const letterMapToWord = (letterMap) => {
+  let word = []
+  Object.keys(letterMap).forEach((letter) => {
+    for(let i = 0; i < letterMap[letter]; i++) {
+      word.push(letter.toUpperCase())
+    }
+  })
+  return word
+}
+
+const checkWordContainsOther = (newWordMap, oldWordMap) => {
+  const letters = Object.keys(oldWordMap);
+  for(let i = 0; i < letters.length; i++) {
+    let letter = letters[i];
+    if (!newWordMap[letter] || oldWordMap[letter] > newWordMap[letter]) {
+      return false
+    }
+    newWordMap[letter] -= oldWordMap[letter]
+    if (newWordMap[letter] === 0)
+      delete newWordMap[letter];
+  }
+  if (Object.keys(newWordMap).length === 0)
+    return false
+  return newWordMap
+}
+
+const checkCenterForWord = (word, flipped) => {
+  const letters = [...word];
+  let foundLetters = {}
+  for (const letter of letters) {
+    let found = false
+    for(let i = 0; i < flipped.length; i++) {
+      const flippedLetter = flipped[i];
+      if (letter.toUpperCase() === flippedLetter.toUpperCase() && !foundLetters[i]) {
+        foundLetters[i] = i;
+        found = true;
+        break
+      }
+    }
+    if (!found)
+      return false;
+  }
+  return foundLetters
+}
+
+
 module.exports = {
-    shuffle: shuffle
+    shuffle: shuffle,
+    letterCountMap: letterCountMap,
+    letterMapToWord: letterMapToWord,
+    checkWordContainsOther: checkWordContainsOther,
+    checkCenterForWord: checkCenterForWord
 }

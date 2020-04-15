@@ -101,26 +101,6 @@ class Room {
     this.sendServerMessage(`${this.players[data.playerId].nickname} has added the word: ${word} to the dictionary!`)
   }
 
-  checkCenterForWord(word) {
-    const letters = [...word];
-    let foundLetters = {}
-    for (const letter of letters) {
-      let found = false
-      for(let i = 0; i < this.flipped.length; i++) {
-        const flippedLetter = this.flipped[i];
-        if (letter.toUpperCase() === flippedLetter.toUpperCase() && !foundLetters[i]) {
-          foundLetters[i] = i;
-          found = true;
-          break
-        }
-      }
-      if (!found) {
-        return false
-      }
-    }
-    return foundLetters
-  }
-
   takeFromCenter(indices) {
     this.flipped = this.flipped.filter((_, index) => {
       return indices[index] === undefined
@@ -145,7 +125,7 @@ class Room {
 
   createWord(data, word) {
     if (!this.isValidWord(word, data)) {return}
-    let indices = this.checkCenterForWord(word.toUpperCase());
+    let indices = helpers.checkCenterForWord(word, this.flipped);
     const player = this.players[data.playerId]
     if (indices !== false) {
       this.addWordToPlayer(data.playerId, word)
@@ -156,21 +136,25 @@ class Room {
     }
   }
 
-  stealWord(data, args) {
-    let oldWord = args[0].word.toUpperCase()
-    let newWord = args[1].toUpperCase()
-    const difference = this.checkWordContainsOther(this.getLetterMap(newWord), this.getLetterMap(oldWord))
+  stealWord(data, victim, oldWord, newWord) {
+    if (typeof(oldWord) !== 'string' || typeof(newWord) !== 'string') return
+    oldWord = oldWord.toUpperCase()
+    newWord = newWord.toUpperCase()
+    logger.info(`${this.players[data.playerId].nickname} attempting to steal the word: ${oldWord} to create: ${newWord}`)
+    let newWordMap = helpers.letterCountMap(newWord)
+    let oldWordMap = helpers.letterCountMap(oldWord)
+    const difference = helpers.checkWordContainsOther(newWordMap, oldWordMap)
     if (!difference) {
       return this.sendPrivateServerMessage(this.getSocket(data.playerId), `The word ${newWord} doesn't contain all of the letters from ${oldWord} + at least 1 from the center!!`);
     }
     if (!this.isValidWord(newWord, data)) {return}
-    const correctCenterPieces = this.checkCenterForWord(this.letterMapToWord(difference));
+    const correctCenterPieces = helpers.checkCenterForWord(helpers.letterMapToWord(difference), this.flipped);
     if (!correctCenterPieces) {
       return this.sendPrivateServerMessage(this.getSocket(data.playerId), `The word ${newWord} contains some letters that aren't in the center!!`);
     } else {
       this.takeFromCenter(correctCenterPieces)
     }
-    this.removeWordFromPlayer(args[0].playerId, oldWord);
+    this.removeWordFromPlayer(victim, oldWord);
     this.addWordToPlayer(data.playerId, newWord);
     this.sendServerMessage(`${this.players[data.playerId].nickname} stole the word: ${oldWord} to create: ${newWord}!!!`)
 
@@ -185,42 +169,6 @@ class Room {
     } else {
       return this.sendPrivateServerMessage(this.getSocket(data.playerId), `Failed to put back word ${word}! Are you sure that's not someone elses?`);
     }
-  }
-
-  getLetterMap(word) {
-    let letters = {};
-    for(let i = 0; i < word.length; i++) {
-      if (!letters[word.charAt(i)])
-        letters[word.charAt(i).toUpperCase()] = 0
-      letters[word.charAt(i).toUpperCase()] = letters[word.charAt(i).toUpperCase()] + 1;
-    }
-    return letters;
-  }
-
-  letterMapToWord(letterMap) {
-    let word = []
-    Object.keys(letterMap).forEach((letter) => {
-      for(let i = 0; i < letterMap[letter]; i++) {
-        word.push(letter.toUpperCase())
-      }
-    })
-    return word
-  }
-
-  checkWordContainsOther(newWordMap, oldWordMap) {
-    const letters = Object.keys(oldWordMap);
-    for(let i = 0; i < letters.length; i++) {
-      let letter = letters[i];
-      if (!newWordMap[letter] || oldWordMap[letter] > newWordMap[letter]) {
-        return false
-      }
-      newWordMap[letter] -= oldWordMap[letter]
-      if (newWordMap[letter] === 0)
-        delete newWordMap[letter];
-    }
-    if (Object.keys(newWordMap).length === 0)
-      return false
-    return newWordMap
   }
 
   handlePlayerMessage(data) {
@@ -239,7 +187,8 @@ class Room {
       case Constants.COMMANDS.CREATE_WORD:
         return this.createWord(data, args[0])
       case Constants.COMMANDS.STEAL_WORD:
-        return this.stealWord(data, args)
+        if (!args[0]) return
+        return this.stealWord(data, args[0].playerId, args[0].word, args[1])
       case Constants.COMMANDS.PUT_BACK:
         return this.putBackWord(data, args[0])
       case Constants.COMMANDS.OVERRIDE:
@@ -275,7 +224,7 @@ class Room {
     }
     this.sendMessage(data)
   }
-
+  
   sendMessage(data) {
     switch (data.type) {
       case Constants.CHAT_MSG_TYPES.SERVER_MESSAGE:
@@ -299,7 +248,7 @@ class Room {
     this.playerCount = this.playerCount + 1
   }
 
-  removePlayer(socket, callback) {
+  removePlayer(socket) {
     if (this.players[socket.id]) {
       this.players[socket.id].status = 'disconnected'
       this.sendServerMessage(`${this.players[socket.id].nickname} has left the room!`)

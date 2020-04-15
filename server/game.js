@@ -18,6 +18,7 @@ class Game {
   }
 
   handlePlayerMessage(socket, message) {
+    if (!this.players[socket.id]) return logger.error(`Unable to handle unregistered player action with socket id: ${socket.id}`)
     const data = {
       type: Constants.CHAT_MSG_TYPES.PLAYER_MESSAGE,
       player: this.players[socket.id].nickname,
@@ -28,6 +29,7 @@ class Game {
   }
 
   handlePlayerAction(socket, action) {
+    if (!this.players[socket.id]) return logger.error(`Unable to handle unregistered player action with socket id: ${socket.id}`)
     const data = {
       player: this.players[socket.id].nickname,
       playerId: socket.id,
@@ -36,22 +38,8 @@ class Game {
     this.getPlayerRoom(socket).handlePlayerCommand(data, action.command, action.args)
   }
 
-  leaveRoom(socket) {
-    const room = this.getPlayerRoom(socket)
-    if (room) {
-      room.removePlayer(socket)
-      socket.leave(room.id, () => {
-        if (room.playerCount === 0) {
-          this.rooms[room.id] = null
-          room.destroy()
-          delete this.rooms[room.id]
-        }
-      })
-    }
-  }
-
   addPlayer(socket, nickname, room) {
-    console.log(socket.id)
+    logger.info(`Player ${nickname} has joined room ${room} with socket id: ${socket.id}`)
     if (this.players[socket.id])
       return this.rooms[room].addPlayer(socket, nickname)
     if (this.rooms[room]) {
@@ -68,7 +56,23 @@ class Game {
     }
   }
 
+  leaveRoom(socket) {
+    const room = this.getPlayerRoom(socket)
+    if (room) {
+      room.removePlayer(socket)
+      socket.leave(room.id, () => {
+        if (room.playerCount === 0) {
+          logger.info(`No players left in room:${room.id}. Deleting...`)
+          this.rooms[room.id] = null
+          room.destroy()
+          delete this.rooms[room.id]
+        }
+      })
+    }
+  }
+
   removePlayer(socket) {
+    logger.info(`Removing player with socket id: ${socket.id}`)
     this.leaveRoom(socket)
     delete this.players[socket.id];
   }
