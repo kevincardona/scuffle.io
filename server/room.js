@@ -13,7 +13,7 @@ class Room {
     this.flipped = new Array(Constants.GAME.TILE_COUNT)
     this.currentPlayer = null;
     this.io = io
-    this.updateInterval = setInterval(this.update.bind(this), 250);
+    this.updateInterval = setInterval(this.update.bind(this), 2000);
     this.generateTable()
   }
 
@@ -80,7 +80,6 @@ class Room {
     this.sendServerMessage(`${data.player} flipped the letter ${newLetter}`)
     if (this.unflipped.length === 0)
       this.sendServerMessage(`There are no letters left to flip! To reset the game type RESET_GAME in chat!`)
-
   }
 
   isValidWord(word, data) {
@@ -183,25 +182,34 @@ class Room {
   handlePlayerCommand(data, command, args) {
     switch(command) {
       case Constants.COMMANDS.FLIP:
-        return this.flipTile(data)
+        this.flipTile(data); 
+        break;
       case Constants.COMMANDS.CREATE_WORD:
-        return this.createWord(data, args[0])
+        this.createWord(data, args[0]); 
+        break;
       case Constants.COMMANDS.STEAL_WORD:
-        if (!args[0]) return
-        return this.stealWord(data, args[0].playerId, args[0].word, args[1])
+        if (!args[0]) break;
+        this.stealWord(data, args[0].playerId, args[0].word, args[1]); 
+        break;
       case Constants.COMMANDS.PUT_BACK:
-        return this.putBackWord(data, args[0])
+        this.putBackWord(data, args[0])
+        break;
       case Constants.COMMANDS.OVERRIDE:
-        return this.overrideWord(data, args[0])
+        this.overrideWord(data, args[0])
+        break;
       case Constants.COMMANDS.RESET_GAME:
-        return this.resetGame()
+        this.resetGame()
+        break;
       case Constants.COMMANDS.RULES:
-        return this.sendPrivateServerMessage(this.getSocket(data.playerId), Constants.SERVER_PROMPTS.RULES);
+        this.sendPrivateServerMessage(this.getSocket(data.playerId), Constants.SERVER_PROMPTS.RULES);
+        break;
       case Constants.COMMANDS.HELP:
-        return this.sendPrivateServerMessage(this.getSocket(data.playerId), Constants.SERVER_PROMPTS.COMMANDS);
+        this.sendPrivateServerMessage(this.getSocket(data.playerId), Constants.SERVER_PROMPTS.COMMANDS);
+        break;
       default:
-        return this.sendPrivateServerMessage(this.getSocket(data.playerId), `Command not found!`);
+        this.sendPrivateServerMessage(this.getSocket(data.playerId), `Command not found!`);
     }
+    this.update();
   }
 
   sendRules(data) {
@@ -246,6 +254,7 @@ class Room {
     }
     this.sendServerMessage(`${nickname} has joined the room!`)
     this.playerCount = this.playerCount + 1
+    this.update()
   }
 
   removePlayer(socket) {
@@ -253,6 +262,7 @@ class Room {
     this.sendServerMessage(`${this.players[socket.id].nickname} has left the room!`)
     delete this.players[socket.id]
     this.playerCount = this.playerCount - 1
+    this.update()
   }
 }
 
