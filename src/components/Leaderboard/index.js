@@ -18,12 +18,13 @@ export default class Leaderboard extends PureComponent {
             <button className="leaderboard__button--help" onClick={toggleInfoModal}>HELP</button>
           </div>
         </div>
-        <h5 className="leaderboard__info--unflipped">UNFLIPPED TILES: <span className="unflipped">{unflipped}</span></h5>
         <h4 className="leaderboard__players--header">
           PLAYERS
+          <div className="leaderboard__info--unflipped">
+            UNFLIPPED TILES: <span className="unflipped">{unflipped}</span>
+          </div>
         </h4>
         <div className="leaderboard__players--container">
-        <div className="leaderboard__players">
           <div className="leaderboard__players--words">
           {
             players && players
@@ -61,7 +62,6 @@ export default class Leaderboard extends PureComponent {
             })
           }
           </div>
-        </div>
         </div>
       </div>
     )
