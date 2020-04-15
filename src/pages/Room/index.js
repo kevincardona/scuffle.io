@@ -125,7 +125,7 @@ export default class Room extends Component {
           <Modal {...modalData} isOpen={isModalOpen} />
           <div id="letters--container">
             {
-              [...Array(Constants.GAME.TILE_COUNT)].map((_, i) => {
+              [...Array(flipped.length + unflipped)].map((_, i) => {
                 if (i < flipped.length)
                   return <Tile key={i} letter={flipped[i]}/>
                 if (i < flipped.length + 20)
