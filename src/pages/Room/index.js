@@ -20,16 +20,20 @@ export default class Room extends Component {
   }
 
   componentDidMount() {
-    const {room} = this.props.match?.params
-    const urlParams = new URLSearchParams(this.props.location.search)
+    const {room, nickname} = this.props
     const socket = getSocket()
-    this.setState({socket: socket})
-    joinRoom(socket, room, urlParams.get('nick'))
+    joinRoom(socket, room, nickname)
     socket.on(Constants.MSG_TYPES.GAME_UPDATE, this.updateRoom)
+    this.setState({ 
+      socket: socket, 
+      nickname: nickname, 
+      room: room 
+    })
   }
 
   componentWillUnmount() {
     const {socket} = this.state
+    leaveRoom(socket)
     socket.close()
   }
 
@@ -74,7 +78,7 @@ export default class Room extends Component {
       type: 'invite',
       header: `Inviting a Friend`,
       prompt: `To invite a friend send them this link: `,
-      copy:  `https://${window.location.host}/#/invite/${this.state.room}`,
+      copy:  `http://${window.location.host}/#/invite/${this.state.room}`,
       submit: null,
       close: this.closeModal
     }
@@ -99,7 +103,7 @@ export default class Room extends Component {
   }
 
   render() {
-    const {socket, loading, flipped, players, unflipped, room, isModalOpen, modalData} = this.state
+    const {socket, loading, flipped, players, room, unflipped, isModalOpen, modalData} = this.state
     if (loading) {
       return (
         <div className="loading">

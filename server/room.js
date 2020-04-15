@@ -145,12 +145,12 @@ class Room {
     let oldWordMap = helpers.letterCountMap(oldWord)
     const difference = helpers.checkWordContainsOther(newWordMap, oldWordMap)
     if (!difference) {
-      return this.sendPrivateServerMessage(this.getSocket(data.playerId), `The word ${newWord} doesn't contain all of the letters from ${oldWord} + at least 1 from the center!!`);
+      return this.sendServerMessage(`${this.players[data.playerId].nickname} attempted to steal the word: ${oldWord} to create the INVALID word: ${newWord}`);
     }
     if (!this.isValidWord(newWord, data)) {return}
     const correctCenterPieces = helpers.checkCenterForWord(helpers.letterMapToWord(difference), this.flipped);
     if (!correctCenterPieces) {
-      return this.sendPrivateServerMessage(this.getSocket(data.playerId), `The word ${newWord} contains some letters that aren't in the center!!`);
+      return this.sendServerMessage(`${this.players[data.playerId].nickname} attempted to steal the word: ${oldWord} to make: ${newWord}! There aren't enough letters for that word!`);
     } else {
       this.takeFromCenter(correctCenterPieces)
     }
@@ -249,17 +249,10 @@ class Room {
   }
 
   removePlayer(socket) {
-    if (this.players[socket.id]) {
-      this.players[socket.id].status = 'disconnected'
-      this.sendServerMessage(`${this.players[socket.id].nickname} has left the room!`)
-      setTimeout(() => {
-        if (!this.players[socket.id]) return;
-        if (this.players[socket.id].status !== 'connected') {
-          delete this.players[socket.id]
-          this.playerCount = this.playerCount - 1
-        }
-      }, 30000);
-    }
+    if (!this.players[socket.id]) return logger.error(`Attempted to remove nonexistent player: ${socket.id} from room: ${this.id}`)
+    this.sendServerMessage(`${this.players[socket.id].nickname} has left the room!`)
+    delete this.players[socket.id]
+    this.playerCount = this.playerCount - 1
   }
 }
 
