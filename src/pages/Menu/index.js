@@ -5,7 +5,7 @@ import './menu.scss'
 
 const Menu = (props) => {
   const [room, setRoom] = useState();
-  const [nickname, setNickname] = useState()
+  const [nickname, setNickname] = useState('')
   const [disabled, setDisabled] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
 
@@ -42,9 +42,9 @@ const Menu = (props) => {
       }
       <div id="menu-buttons">
         { (room && nickname) ?
-          <Link className="button--link" onClick={()=>setIsPlaying(true)}>
+          <span className="button--link" onClick={()=>setIsPlaying(true)}>
             <button type="button" className="btn btn-primary menu-button">PLAY</button>
-          </Link>
+          </span>
           :
           <button type="button" className="btn btn-primary menu-button" disabled>PLAY</button>
         }

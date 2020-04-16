@@ -51,14 +51,17 @@
       background-color: rgb(33, 90, 25);
     }
   }
-  &--steal {
-    background-color: rgb(231, 44, 44);
-    &:hover {
-      background-color: rgb(168, 31, 31);
-    } 
-    &:active {
-      background-color: rgb(129, 21, 21);
-    }
+  &--finished {
+      background-color: rgb(231, 44, 44);
+      &:hover {
+        background-color: rgb(168, 31, 31);
+      } 
+      &:active {
+        background-color: rgb(129, 21, 21);
+      }
+  }
+  &--waiting {
+    background-color: rgb(211, 87, 87);
   }
 }
 

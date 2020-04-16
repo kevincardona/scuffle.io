@@ -9,7 +9,9 @@ class Room {
     this.id = id;
     this.playerCount = 0
     this.players = {};
+    this.playerOrder = []
     this.overrides = {}
+    this.currentPlayer = 0
     this.flipped = new Array(Constants.GAME.TILE_COUNT)
     this.currentPlayer = null;
     this.io = io
@@ -60,7 +62,8 @@ class Room {
       room: this.id,
       unflippedCount: this.unflipped.length,
       flipped: this.flipped,
-      players: players
+      players: players,
+      currentPlayer: this.playerOrder[this.currentPlayer % this.playerOrder.length]
     }
     
     return data;
@@ -79,7 +82,7 @@ class Room {
     this.flipped.push(newLetter);
     this.sendServerMessage(`${data.player} flipped the letter ${newLetter}`)
     if (this.unflipped.length === 0)
-      this.sendServerMessage(`There are no letters left to flip! To reset the game type RESET_GAME in chat!`)
+      this.sendServerMessage(`There are no letters left to flip! If you don't see any more words to create/steal click the "Finished" button to end the game!`)
   }
 
   isValidWord(word, data) {
@@ -112,6 +115,7 @@ class Room {
       player.words = []
     player.words.push(word.toUpperCase());
     player.score += word.length
+    this.currentPlayer = this.playerOrder.indexOf(playerId);
   }
 
   removeWordFromPlayer(playerId, word) {
@@ -179,6 +183,52 @@ class Room {
     }
   }
 
+  playerIsDone(data) {
+    this.players[data.playerId].isDone = true;
+    let done = this.playerOrder.reduce((total, playerId) => {
+      if (this.players[playerId].isDone)
+        return total + 1;
+      return total
+    }, 0)
+    this.sendServerMessage(`${this.players[data.playerId].nickname} is done! ${done}/${this.playerOrder.length} players done.`)
+    this.endGame();
+  }
+
+  endGame() {
+    let winners = [];
+    let topScore = -1;
+    let player;
+    for(let i = 0; i < this.playerOrder.length; i++) {
+      player = this.players[this.playerOrder[i]]
+      if (!player.isDone) {
+        return
+      }
+      if (player.score > topScore) {
+        topScore = player.score;
+        winners = [player]
+      } else if (player.score === topScore) {
+        winners.push(player);
+      }
+    }
+    if (winners.length === 1)
+      this.sendServerMessage(`${winners[0].nickname} has won with ${topScore} points!`)
+    else {
+      let winnerNames = ''
+      for (let i = 0; i < winners.length; i++) {
+        if (i < winners.length - 1 && i !== 0)
+          winnerNames = winnerNames + ', ' + winners[i].nickname;
+        else if (i === 0)
+          winnerNames = winnerNames + winners[i].nickname
+        else if (i === winners.length - 1 && winners.length > 2)
+          winnerNames = winnerNames + ', and ' + winners[i].nickname
+        else 
+          winnerNames = winnerNames + ' and ' + winners[i].nickname
+      }
+      this.sendServerMessage(`${winnerNames} have tied for first with ${topScore} points!`)
+    }
+    this.resetGame()
+  }
+
   handlePlayerCommand(data, command, args) {
     switch(command) {
       case Constants.COMMANDS.FLIP:
@@ -199,6 +249,9 @@ class Room {
         break;
       case Constants.COMMANDS.RESET_GAME:
         this.resetGame()
+        break;
+      case Constants.COMMANDS.DONE:
+        this.playerIsDone(data);
         break;
       case Constants.COMMANDS.RULES:
         this.sendPrivateServerMessage(this.getSocket(data.playerId), Constants.SERVER_PROMPTS.RULES);
@@ -252,6 +305,7 @@ class Room {
       nickname: nickname,
       score: 0
     }
+    this.playerOrder.push(socket.id);
     this.sendServerMessage(`${nickname} has joined the room!`)
     this.playerCount = this.playerCount + 1
     this.update()
@@ -261,6 +315,7 @@ class Room {
     if (!this.players[socket.id]) return logger.error(`Attempted to remove nonexistent player: ${socket.id} from room: ${this.id}`)
     this.sendServerMessage(`${this.players[socket.id].nickname} has left the room!`)
     delete this.players[socket.id]
+    this.playerOrder.splice(this.playerOrder.indexOf(socket.id),1);
     this.playerCount = this.playerCount - 1
     this.update()
   }

@@ -6,6 +6,7 @@ module.exports = Object.freeze({
       PUT_BACK: 'PUT_BACK',
       STEAL_WORD: 'STEAL_WORD',
       RESET_GAME: 'RESET_GAME',
+      DONE: 'DONE',
       RULES: 'RULES',
       HELP: 'HELP'
     },
@@ -68,6 +69,6 @@ module.exports = Object.freeze({
         WINNING
         When all of the letters from the center have been flipped and nobody has any steals/words to create using the center letters then the game is over. The player with the most letters wins the game.
       `,
-    COMMANDS: `To reset the game type /reset_game. To put a word back from your personal pile type /put_back <word>.`
+    COMMANDS: `There are no other commands at this time!`
   },
 })

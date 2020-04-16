@@ -1,8 +1,8 @@
 .modal {
   z-index: 9999;
-  position: absolute;
+  position: fixed;
+  width: 80vw;
   display: block;
-  width: auto;
   height: auto;
   top: 40%;
   left: 50%;
@@ -34,6 +34,11 @@
       height: auto;
     }
   }
+}
+
+.modal > .input-group {
+  margin: auto;
+  max-width: 300px;
 }
 
 

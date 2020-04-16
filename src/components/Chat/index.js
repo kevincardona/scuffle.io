@@ -11,7 +11,6 @@ export default class Chat extends Component {
       messages: [],
       input: "",
     }
-    this.getMessage.bind(this)
   }
 
   componentDidMount() {

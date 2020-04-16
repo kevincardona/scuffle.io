@@ -15,11 +15,16 @@ export default class Room extends Component {
       loading: true,
       isModalOpen: false,
       modalData: null,
-      socket: null
+      socket: null,
+      isFinished: false
     }
   }
 
   componentDidMount() {
+    this.connect();
+  }
+
+  connect = () => {
     const {room, nickname} = this.props
     const socket = getSocket()
     joinRoom(socket, room, nickname)
@@ -28,6 +33,11 @@ export default class Room extends Component {
       socket: socket, 
       nickname: nickname, 
       room: room 
+    })
+    socket.on('disconnect',() => {
+      alert("Disconnected from room!")
+      window.location.reload()
+      this.setState({loading: true})
     })
   }
 
@@ -45,6 +55,12 @@ export default class Room extends Component {
       flipped: data.flipped,
       room: data.room,
     })
+    if (data.unflippedCount === Constants.GAME.TILE_COUNT && this.state.isFinished)
+      this.setFinished(false)
+  }
+  
+  setFinished = (finished) => {
+    this.setState({isFinished: finished})
   }
 
   closeModal = () => { this.setState({ isModalOpen: false, modalData: null }) }
@@ -103,7 +119,7 @@ export default class Room extends Component {
   }
 
   render() {
-    const {socket, loading, flipped, players, room, unflipped, isModalOpen, modalData} = this.state
+    const {socket, loading, flipped, players, room, unflipped, isFinished, isModalOpen, modalData} = this.state
     if (loading) {
       return (
         <div className="loading">
@@ -138,7 +154,7 @@ export default class Room extends Component {
               })
             }
           </div>
-          <ControlPanel socket={socket} create={this.triggerCreate}>
+          <ControlPanel socket={socket} create={this.triggerCreate} unflipped={unflipped} finished={isFinished} setFinished={this.setFinished}>
             <Chat socket={socket}/>
           </ControlPanel>
         </div>

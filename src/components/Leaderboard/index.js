@@ -29,7 +29,6 @@ export default class Leaderboard extends PureComponent {
           {
             players && players
               .sort((a, b)=>{
-                console.log(socket.id)
                 if (b.playerId === socket.id)
                   return 1;
                 if (a.score > b.score)
