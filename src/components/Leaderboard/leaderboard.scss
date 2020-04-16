@@ -68,22 +68,35 @@
   }
 }
 
+$colors: #9e080840, #80089e40, #081b9e40, #089e9040, #0b9e0840, #9e990840, #9e4d0840;
+
 .player {
   margin-bottom: 30px;
+  height: fit-content;
+  border-radius: 10px;
   &--name {
-    color: darkgray;
+    color: white;
     font-size: 20px;
     font-weight: bold;
   }
   &__word {
     transform: scale(0.5);
   }
+  &--score {
+    margin: 5px;
+  }
   &__words {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    background-color: rgb(94, 94, 94);
     border-radius: 10px;
+  }
+}
+
+@for $i from 1 through length($colors){
+  .player:nth-child(#{length($colors)}n+#{$i}) {
+    
+    background: nth($colors, $i);
   }
 }
 

@@ -47,7 +47,6 @@ export default class Leaderboard extends PureComponent {
                   <div className="player--score">
                     POINTS: {player.score ? player.score : 0}
                   </div>
-                  {!player.words && "NO WORDS"}
                   <div className="player__words">
                     {
                       player.words && player.words.map((word, index)=> {
