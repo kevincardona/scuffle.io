@@ -35,6 +35,7 @@ class Game {
       playerId: socket.id,
       action: action
     }
+    console.warn(action)
     this.getPlayerRoom(socket).handlePlayerCommand(data, action.command, action.args)
   }
 

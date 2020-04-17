@@ -28,7 +28,7 @@ const letterMapToWord = (letterMap) => {
       word.push(letter.toUpperCase())
     }
   })
-  return word
+  return word.join('')
 }
 
 const checkWordContainsOther = (newWordMap, oldWordMap) => {

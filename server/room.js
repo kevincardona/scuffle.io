@@ -1,12 +1,14 @@
 const Constants = require('../src/constants');
 const helpers = require('./utils/helpers');
+const Player = require('./player');
 const checkWord = require('check-word'), words = checkWord('en');
 const { loggers } = require('winston');
 const logger = loggers.get('main-logger');
 
 class Room {
-  constructor(io, id) {
+  constructor(io, id, privateRoom=true) {
     this.id = id;
+    this.privateRoom = privateRoom
     this.playerCount = 0
     this.players = {};
     this.playerOrder = []
@@ -50,14 +52,7 @@ class Room {
   }
 
   getRoomData() {
-    const players = Object.keys(this.players).map((player) => {
-      return {
-        nickname: this.players[player].nickname,
-        playerId: this.players[player].playerId,
-        words: this.players[player].words,
-        score: this.players[player].score
-      }
-    })
+    const players = Object.keys(this.players).map((player) =>this.players[player].getPlayerData())
     const data = {
       room: this.id,
       unflippedCount: this.unflipped.length,
@@ -85,92 +80,81 @@ class Room {
       this.sendServerMessage(`There are no letters left to flip! If you don't see any more words to create/steal click the "Finished" button to end the game!`)
   }
 
-  isValidWord(word, data) {
+  overrideWord(data, word) {
+    if (this.privateRoom) {
+      this.overrides[word.toLowerCase()] = true
+      this.sendServerMessage(`${this.players[data.playerId].nickname} has added the word: ${word} to the dictionary!`)
+    } else {
+      this.sendPrivateMessage(data.playerId, `You can't override words in a public match!`)
+
+    }
+  }
+
+  takeFromCenter(letterIndex) {
+    this.flipped = this.flipped.filter((_, index) => {
+      return letterIndex[index] === undefined
+    })
+  }
+
+  isValidWord(data, word, stealing = false) {
     word = word.toLowerCase()
-    if ((word == null || word.length < 3) && this.overrides[word] == null) {
-      if (data)
-        this.sendPrivateServerMessage(this.getSocket(data.playerId), 'Your word needs to be real and at least 3 characters long!')
+    if ((word == null || (word.length < 3) && this.overrides[word] == null)) {
+      this.sendPrivateMessage(this.getSocket(data.playerId), 'Your word needs to be real and at least 3 characters long!')
       return false
     }
     if (words.check(word.toLowerCase()) || this.overrides[word] != null)
       return true
-    this.sendPrivateServerMessage(this.getSocket(data.playerId), 'That\'s not a real word! To allow this word type /override word')
+    this.sendPrivateMessage(this.getSocket(data.playerId), 'That\'s not a real word! To allow this word type /override word')
     return false
   }
 
-  overrideWord(data, word) {
-    this.overrides[word.toLowerCase()] = true
-    this.sendServerMessage(`${this.players[data.playerId].nickname} has added the word: ${word} to the dictionary!`)
-  }
-
-  takeFromCenter(indices) {
-    this.flipped = this.flipped.filter((_, index) => {
-      return indices[index] === undefined
-    })
-  }
-
-  addWordToPlayer(playerId, word) {
-    const player = this.players[playerId]
-    if (!player.words)
-      player.words = []
-    player.words.push(word.toUpperCase());
-    player.score += word.length
-    this.currentPlayer = this.playerOrder.indexOf(playerId);
-  }
-
-  removeWordFromPlayer(playerId, word) {
-    const player = this.players[playerId]
-    if (!player.words)
-      player.words = []
-    player.words.splice(player.words.indexOf(word), 1)
-    player.score -= word.length
-  }
-
-  createWord(data, word) {
-    if (!this.isValidWord(word, data)) {return}
-    let indices = helpers.checkCenterForWord(word, this.flipped);
+  createWord(data, word, stealing = false) {
+    if (!stealing && !this.isValidWord(data, word, stealing)) {return}
+    console.warn("Check cetner for " + word)
+    const letterIndex = helpers.checkCenterForWord(word, this.flipped);
     const player = this.players[data.playerId]
-    if (indices !== false) {
-      this.addWordToPlayer(data.playerId, word)
-      this.takeFromCenter(indices)
-      this.sendServerMessage(`${player.nickname} made the word: ${word}`)
+    console.log(letterIndex)
+    if (letterIndex !== false && !stealing) {
+      this.players[data.playerId].addWord(word)
+      this.takeFromCenter(letterIndex)
+      this.sendServerMessage(`${player.nickname} made the word: ${word.toUpperCase()}`)
+      return true;
+    } else if (letterIndex !== false) {
+      return true;
     } else {
-      this.sendPrivateServerMessage(this.getSocket(data.playerId), 'That word can\'t be made!')
+      if (!stealing)
+        this.sendServerMessage(`${player.nickname} tried to make the word ${word.toUpperCase()}`)
+      return false;
     }
   }
 
   stealWord(data, victim, oldWord, newWord) {
+    logger.info(`${this.players[data.playerId].nickname} attempting to steal the word: ${oldWord} to create: ${newWord}`)
     if (typeof(oldWord) !== 'string' || typeof(newWord) !== 'string') return
     oldWord = oldWord.toUpperCase()
     newWord = newWord.toUpperCase()
-    logger.info(`${this.players[data.playerId].nickname} attempting to steal the word: ${oldWord} to create: ${newWord}`)
     let newWordMap = helpers.letterCountMap(newWord)
     let oldWordMap = helpers.letterCountMap(oldWord)
     const difference = helpers.checkWordContainsOther(newWordMap, oldWordMap)
-    if (!difference) {
-      return this.sendServerMessage(`${this.players[data.playerId].nickname} attempted to steal the word: ${oldWord} to create the INVALID word: ${newWord}`);
+    if (!difference ||  !this.isValidWord(data, newWord)) {
+      return this.sendServerMessage(`${this.players[data.playerId].nickname} attempted to steal the word: ${oldWord} to create the invalid word: ${newWord}`);
     }
-    if (!this.isValidWord(newWord, data)) {return}
-    const correctCenterPieces = helpers.checkCenterForWord(helpers.letterMapToWord(difference), this.flipped);
-    if (!correctCenterPieces) {
-      return this.sendServerMessage(`${this.players[data.playerId].nickname} attempted to steal the word: ${oldWord} to make: ${newWord}! There aren't enough letters for that word!`);
-    } else {
-      this.takeFromCenter(correctCenterPieces)
+    if (this.createWord(data, helpers.letterMapToWord(difference), true)) {
+      this.players[data.playerId].addWord(newWord);
+      this.players[victim].removeWord(oldWord);
+      return this.sendServerMessage(`${this.players[data.playerId].nickname} stole the word: ${oldWord} to create: ${newWord}!!!`)
     }
-    this.removeWordFromPlayer(victim, oldWord);
-    this.addWordToPlayer(data.playerId, newWord);
-    this.sendServerMessage(`${this.players[data.playerId].nickname} stole the word: ${oldWord} to create: ${newWord}!!!`)
-
+    this.sendServerMessage(`${this.players[data.playerId].nickname} attempted to steal the word: ${oldWord} to create the INVALID word: ${newWord}`);
   }
 
   putBackWord(data, word) {
     let player = this.players[data.playerId]
-    if (player.words.indexOf(word) !== -1) {
-      this.removeWordFromPlayer(data.playerId, word)
+    if (player.hasWord(word)) {
+      player.removeWord(word)
       this.sendServerMessage(`${player.nickname} put ${word} back into the mix!`)
       this.flipped = this.flipped.concat([...word])
     } else {
-      return this.sendPrivateServerMessage(this.getSocket(data.playerId), `Failed to put back word ${word}! Are you sure that's not someone elses?`);
+      return this.sendPrivateMessage(player.socket, `Failed to put back word ${word}! Are you sure that's not someone elses?`);
     }
   }
 
@@ -254,22 +238,22 @@ class Room {
         this.playerIsDone(data);
         break;
       case Constants.COMMANDS.RULES:
-        this.sendPrivateServerMessage(this.getSocket(data.playerId), Constants.SERVER_PROMPTS.RULES);
+        this.sendPrivateMessage(this.getSocket(data.playerId), Constants.SERVER_PROMPTS.RULES);
         break;
       case Constants.COMMANDS.HELP:
-        this.sendPrivateServerMessage(this.getSocket(data.playerId), Constants.SERVER_PROMPTS.COMMANDS);
+        this.sendPrivateMessage(this.getSocket(data.playerId), Constants.SERVER_PROMPTS.COMMANDS);
         break;
       default:
-        this.sendPrivateServerMessage(this.getSocket(data.playerId), `Command not found!`);
+        this.sendPrivateMessage(this.getSocket(data.playerId), `Command not found!`);
     }
     this.update();
   }
 
   sendRules(data) {
-    this.sendPrivateServerMessage(this.getSocket(data.playerId), Constants.SERVER_PROMPTS.RULES);
+    this.sendPrivateMessage(this.getSocket(data.playerId), Constants.SERVER_PROMPTS.RULES);
   }
 
-  sendPrivateServerMessage(socket, message) {
+  sendPrivateMessage(socket, message) {
     const data = {
       type: Constants.CHAT_MSG_TYPES.SERVER_MESSAGE,
       typeModifier: Constants.CHAT_MSG_TYPES.MODIFIERS.PRIVATE,
@@ -299,25 +283,18 @@ class Room {
 
   addPlayer(socket, nickname) {
     logger.debug(`Adding player ${nickname} to room ${this.id}`)
-    this.players[socket.id] = {
-      socket: socket,
-      playerId: socket.id,
-      nickname: nickname,
-      score: 0
-    }
+    this.players[socket.id] = new Player(socket, nickname, this.id)
     this.playerOrder.push(socket.id);
-    this.sendServerMessage(`${nickname} has joined the room!`)
     this.playerCount = this.playerCount + 1
-    this.update()
+    this.sendServerMessage(`${nickname} has joined the room!`)
   }
 
   removePlayer(socket) {
     if (!this.players[socket.id]) return logger.error(`Attempted to remove nonexistent player: ${socket.id} from room: ${this.id}`)
-    this.sendServerMessage(`${this.players[socket.id].nickname} has left the room!`)
-    delete this.players[socket.id]
     this.playerOrder.splice(this.playerOrder.indexOf(socket.id),1);
     this.playerCount = this.playerCount - 1
-    this.update()
+    this.sendServerMessage(`${this.players[socket.id].nickname} has left the room!`)
+    delete this.players[socket.id]
   }
 }
 
