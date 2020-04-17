@@ -7,6 +7,9 @@ const Tile = ({letter, onFlip, onClick}) => {
   useEffect (()=> {
     if (letter)
       setFlipped('tile--flipped')
+    else {
+      setFlipped('tile--unflipped')
+    }
     setLetter(letter)
   },[letter])
 

@@ -40,11 +40,13 @@ export default class Leaderboard extends PureComponent {
               .map((player, index)=>{
               return (
                 <div key={index} className="player">
-                  <div className="player--name">
-                    {player.nickname}
-                  </div>
-                  <div className="player--score">
-                    POINTS: {player.score ? player.score : 0}
+                  <div className="player__header" >
+                    <div className="player__header--name">
+                      {player.nickname}
+                    </div>
+                    <div className="player__header--score">
+                      POINTS: {player.score ? player.score : 0}
+                    </div>
                   </div>
                   <div className="player__words">
                     {

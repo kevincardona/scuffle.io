@@ -16,6 +16,7 @@
     border-bottom: solid 2px gray;
     margin-bottom: 20px;
     background-color: rgb(43, 43, 43);
+    overflow: hidden;
 
     &--buttons {
       display: flex;
@@ -72,16 +73,23 @@
 $colors: #9e080840, #80089e40, #081b9e40, #089e9040, #0b9e0840, #9e990840, #9e4d0840;
 
 .player {
-  margin-bottom: 30px;
+  margin-bottom: 0.2em;
   height: fit-content;
   border-radius: 10px;
-  &--name {
-    color: white;
-    font-size: 20px;
-    font-weight: bold;
-  }
-  &--score {
-    margin: 5px;
+  &__header {
+    &--name {
+      color: white;
+      font-size: 20px;
+      font-weight: bold;
+      max-width: 40vw;
+      overflow: hidden;
+      margin: auto;
+    }
+    &--score {
+      font-style: italic;
+      font-size: 0.8em;
+      margin: 0 1em 0 1em;
+    }
   }
   &__words {
     display: flex;
