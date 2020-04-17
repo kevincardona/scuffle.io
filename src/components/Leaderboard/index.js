@@ -29,8 +29,8 @@ export default class Leaderboard extends PureComponent {
           {
             players && players
               .sort((a, b)=>{
-                if (b.playerId === socket.id)
-                  return 1;
+                if (a.playerId === socket.id)
+                  return -1;
                 if (a.score > b.score)
                   return -1;
                 if (b.score > a.score)
@@ -50,7 +50,7 @@ export default class Leaderboard extends PureComponent {
                     {
                       player.words && player.words.map((word, index)=> {
                         return (
-                          <Word key={index} className="smaller player__word" word={word} onClick={() => steal({ ...player, word: word })}/>
+                          <Word key={index} className="player__word" word={word} onClick={() => steal({ ...player, word: word })}/>
                         )
                       })
                     }

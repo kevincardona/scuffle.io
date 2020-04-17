@@ -110,16 +110,15 @@ class Room {
 
   createWord(data, word, stealing = false) {
     if (!stealing && !this.isValidWord(data, word, stealing)) {return}
-    console.warn("Check cetner for " + word)
     const letterIndex = helpers.checkCenterForWord(word, this.flipped);
     const player = this.players[data.playerId]
-    console.log(letterIndex)
     if (letterIndex !== false && !stealing) {
       this.players[data.playerId].addWord(word)
       this.takeFromCenter(letterIndex)
       this.sendServerMessage(`${player.nickname} made the word: ${word.toUpperCase()}`)
       return true;
     } else if (letterIndex !== false) {
+      this.takeFromCenter(letterIndex)
       return true;
     } else {
       if (!stealing)

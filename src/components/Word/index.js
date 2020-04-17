@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import Tile from '../Tile';
 import './word.scss'
 
 export default class Word extends Component {
@@ -13,7 +12,7 @@ export default class Word extends Component {
     return (
       <div {...this.props} className={"word " + this.props.className}>
         { 
-          [...word].map((letter, index) => <Tile key={index} letter={letter}/>)
+          [...word].map((letter) => <div className="word__letter">{letter}</div>)
         }
       </div>
     )

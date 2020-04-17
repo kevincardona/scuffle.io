@@ -2,4 +2,15 @@
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
+  margin: 1em;
+  &__letter {
+    width: 1.5em;
+    height: 1.5em;
+    line-height: 1.5em;
+    font-size: 1.5rem;
+    border: solid 1px;
+    background: linear-gradient(to top, darkgray, 1%, rgb(253,235,185));
+    color: black;
+    border-radius: 0.3em;
+  }
 }
