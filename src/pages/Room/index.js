@@ -53,9 +53,10 @@ export default class Room extends Component {
       players: data.players,
       unflipped: data.unflippedCount,
       flipped: data.flipped,
-      room: data.room,
+      room: data.roomName,
+      roomId: data.roomId
     })
-    if (data.unflippedCount === Constants.GAME.TILE_COUNT && this.state.isFinished)
+    if (data.unflippedCount > 0 && this.state.isFinished)
       this.setFinished(false)
   }
   
@@ -94,7 +95,7 @@ export default class Room extends Component {
       type: 'invite',
       header: `Inviting a Friend`,
       prompt: `To invite a friend send them this link: `,
-      copy:  `http://${window.location.host}/#/invite/${this.state.room}`,
+      copy:  `http://${window.location.host}/#/invite/${this.state.roomId}`,
       submit: null,
       close: this.closeModal
     }

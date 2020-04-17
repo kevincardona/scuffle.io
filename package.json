@@ -9,6 +9,7 @@
     "@testing-library/user-event": "^7.1.2",
     "check-word": "^1.1.0",
     "concurrently": "^5.1.0",
+    "crypto": "^1.0.1",
     "node-sass": "^4.13.1",
     "path": "^0.12.7",
     "react": "^16.13.1",

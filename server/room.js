@@ -6,7 +6,7 @@ const { loggers } = require('winston');
 const logger = loggers.get('main-logger');
 
 class Room {
-  constructor(io, id, privateRoom=true) {
+  constructor(io, id, privateRoom=false) {
     this.id = id;
     this.privateRoom = privateRoom
     this.playerCount = 0
@@ -54,7 +54,8 @@ class Room {
   getRoomData() {
     const players = Object.keys(this.players).map((player) =>this.players[player].getPlayerData())
     const data = {
-      room: this.id,
+      roomName: this.privateRoom ? "Private Room" : this.id,
+      roomId: this.id,
       unflippedCount: this.unflipped.length,
       flipped: this.flipped,
       players: players,
@@ -84,9 +85,6 @@ class Room {
     if (this.privateRoom) {
       this.overrides[word.toLowerCase()] = true
       this.sendServerMessage(`${this.players[data.playerId].nickname} has added the word: ${word} to the dictionary!`)
-    } else {
-      this.sendPrivateMessage(data.playerId, `You can't override words in a public match!`)
-
     }
   }
 
@@ -228,10 +226,16 @@ class Room {
         this.putBackWord(data, args[0])
         break;
       case Constants.COMMANDS.OVERRIDE:
-        this.overrideWord(data, args[0])
+        if (!this.privateRoom)
+          this.overrideWord(data, args[0])
+        else
+          this.sendPrivateMessage(`You can't use that command in a public room!`)
         break;
       case Constants.COMMANDS.RESET_GAME:
-        this.resetGame()
+        if (!this.privateRoom)
+          this.resetGame()
+        else
+          this.sendPrivateMessage(`You can't use that command in a public room!`)
         break;
       case Constants.COMMANDS.DONE:
         this.playerIsDone(data);
@@ -244,6 +248,7 @@ class Room {
         break;
       default:
         this.sendPrivateMessage(this.getSocket(data.playerId), `Command not found!`);
+        break;
     }
     this.update();
   }

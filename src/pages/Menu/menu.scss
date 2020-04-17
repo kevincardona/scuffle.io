@@ -12,6 +12,15 @@
   text-align: center;
 }
 
+.play-menu {
+  &__checkbox {
+    &--label {
+      font-size: 0.5rem;
+      margin-right: 0.5em;
+    }
+  }
+}
+
 .menu-button {
   margin-top: 0.625rem;
 }

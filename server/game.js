@@ -1,4 +1,5 @@
 const Constants = require('../src/constants');
+const crypto    = require('crypto');
 const Room = require('./room');
 const { loggers } = require('winston')
 const logger = loggers.get('main-logger')
@@ -15,6 +16,14 @@ class Game {
   getPlayerRoom(socket) {
     if (this.players[socket.id])
       return this.rooms[this.players[socket.id].room]
+  }
+
+  createPrivateRoom() {
+    let room = crypto.randomBytes(20).toString('hex');
+    if (this.rooms[room])
+      return this.createPrivateRoom()
+    this.rooms[room] = new Room(this.io, room, true);
+    return room
   }
 
   handlePlayerMessage(socket, message) {
@@ -40,6 +49,7 @@ class Game {
 
   addPlayer(socket, nickname, room) {
     logger.info(`Player ${nickname} has joined room ${room} with socket id: ${socket.id}`)
+    if (!room) { room = this.createPrivateRoom() }
     if (this.players[socket.id])
       return this.rooms[room].addPlayer(socket, nickname)
     if (this.rooms[room]) {
