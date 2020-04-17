@@ -23,6 +23,11 @@
 }
 
 .panel {
+  &--left {
+    position: relative;
+    left: 0%;
+    width: 50vw;
+  }
   &--right {
     position: relative;
     right: 0%;
@@ -30,12 +35,7 @@
     height: 100vh;
     display: flex;
     flex-direction: column;
-
-  }
-  &--left {
-    position: relative;
-    left: 0%;
-    width: 50vw;
+    border-left: solid 0.313em black;
   }
 }
 
