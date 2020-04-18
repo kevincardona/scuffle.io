@@ -28,14 +28,14 @@ module.exports = Object.freeze({
     }
   },
   GAME: {
-    TILE_COUNT: 144,
+    TILE_COUNT: 150,
     LETTER_DISTRIBUTION: {
-      A: 13,
-      B: 3,
-      C: 3,
+      A: 14,
+      B: 5,
+      C: 5,
       D: 6,
       E: 18,
-      F: 3,
+      F: 4,
       G: 4,
       H: 3,
       I: 12,

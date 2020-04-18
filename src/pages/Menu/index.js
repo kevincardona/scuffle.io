@@ -1,16 +1,22 @@
 import React, {Fragment, useState, useEffect} from 'react';
 import {Link} from 'react-router-dom'
+import {apiGet} from '../../util/api';
 import Room from '../Room';
 import './menu.scss'
-
+ 
 const Menu = (props) => {
   const [room, setRoom] = useState('');
   const [nickname, setNickname] = useState('')
   const [isPrivate, setIsPrivate] = useState(true)
   const [disabled, setDisabled] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
+  const [playerCount, setPlayerCount] = useState(0);
 
   useEffect(()=>{
+    apiGet('playercount').then((res) => {
+      if (res.success)
+        setPlayerCount(res.playerCount)
+    })
     setRoom(props?.match?.params?.room);
     setDisabled(props?.match?.params?.room != null)
   }, [props])
@@ -35,7 +41,8 @@ const Menu = (props) => {
     <div id="play-menu">
       <div className="title">
         <h1>Scuffle</h1>
-      </div>
+        <p className="play-menu__header--count">{playerCount} online</p>
+      </div> 
       <input 
         type="text" 
         className="input-group-text mb-2" 
@@ -44,6 +51,7 @@ const Menu = (props) => {
         placeholder="Nickname" 
         value={nickname} 
         onChange={e => setNickname(e.target.value)} 
+        maxLength="15"
       />
       { !disabled &&
         <Fragment>
@@ -70,6 +78,7 @@ const Menu = (props) => {
           value={room || ''} 
           disabled={disabled}
           onChange={e => setRoom(e.target.value)} 
+          maxLength="15"
         />
       }
       <div id="menu-buttons">

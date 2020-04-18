@@ -9,10 +9,12 @@ class Sound extends Component {
     this.audio = new Audio(this.props.url)
   }
   componentDidMount() {
+    /*
     setTimeout(() => {
       this.audio.volume = this.props.volume || 0.3
       this.audio.play()
     }, this.props.delay)
+    */
   }
   render() {
     return null;

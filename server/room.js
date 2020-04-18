@@ -118,10 +118,15 @@ class Room {
     word = word.toLowerCase()
     if ((word == null || (word.length < 3) && this.overrides[word] == null)) {
       this.sendPrivateMessage(this.getSocket(data.playerId), 'Your word needs to be real and at least 3 characters long!')
+      if (!stealing)
+        this.sendServerMessage(`${this.players[data.playerId].nickname} tried to make the INVALID word ${word.toUpperCase()}`)
       return false
     }
     if (words.check(word.toLowerCase()) || this.overrides[word] != null)
       return true
+
+    if (!stealing)
+      this.sendServerMessage(`${this.players[data.playerId].nickname} tried to make the INVALID word ${word.toUpperCase()}`)
     this.sendPrivateMessage(this.getSocket(data.playerId), 'That\'s not a real word! To allow this word type /override word')
     return false
   }

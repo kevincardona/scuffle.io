@@ -1,6 +1,21 @@
 import io from 'socket.io-client';
 import Constants from '../constants';
 
+export const apiGet = (endpoint) => {
+  const HEADERS = {
+    Accept: "application/json",
+    "Content-Type": "application/json",
+    token: localStorage.getItem("token")
+  };
+  let result = fetch(`api/${endpoint}`, { headers: HEADERS })
+    .then(res => res.json())
+    .catch(function(error) {
+      console.warn(error)
+      return error;
+    });
+  return result
+}
+ 
 export const getSocket = () => {
   const protocol = (window.location.protocol.includes('https')) ? 'wss' : 'ws';
   const socket = io(`${protocol}://${window.location.host}`, {
