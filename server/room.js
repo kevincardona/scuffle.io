@@ -222,20 +222,20 @@ class Room {
         if (!args[0]) break;
         this.stealWord(data, args[0].playerId, args[0].word, args[1]); 
         break;
-      case Constants.COMMANDS.PUT_BACK:
+      case Constants.COMMANDS.RETURN:
         this.putBackWord(data, args[0])
         break;
       case Constants.COMMANDS.OVERRIDE:
-        if (!this.privateRoom)
+        if (this.privateRoom)
           this.overrideWord(data, args[0])
         else
-          this.sendPrivateMessage(`You can't use that command in a public room!`)
+          this.sendPrivateMessage(this.getSocket(data.playerId), `You can't use that command in a public room!`)
         break;
-      case Constants.COMMANDS.RESET_GAME:
-        if (!this.privateRoom)
+      case Constants.COMMANDS.RESET:
+        if (this.privateRoom)
           this.resetGame()
         else
-          this.sendPrivateMessage(`You can't use that command in a public room!`)
+          this.sendPrivateMessage(this.getSocket(data.playerId), `You can't use that command in a public room!`)
         break;
       case Constants.COMMANDS.DONE:
         this.playerIsDone(data);

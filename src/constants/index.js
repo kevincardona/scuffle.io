@@ -3,9 +3,9 @@ module.exports = Object.freeze({
     FLIP: 'FLIP',
     CREATE_WORD: 'CREATE_WORD',
     OVERRIDE: 'OVERRIDE',
-    PUT_BACK: 'PUT_BACK',
+    RETURN: 'RETURN',
     STEAL_WORD: 'STEAL_WORD',
-    RESET_GAME: 'RESET_GAME',
+    RESET: 'RESET',
     DONE: 'DONE',
     RULES: 'RULES',
     HELP: 'HELP'

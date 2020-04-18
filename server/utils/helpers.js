@@ -54,7 +54,7 @@ const checkCenterForWord = (word, flipped) => {
     let found = false
     for(let i = 0; i < flipped.length; i++) {
       const flippedLetter = flipped[i];
-      if (letter.toUpperCase() === flippedLetter.toUpperCase() && !foundLetters[i]) {
+      if (letter.toUpperCase() === flippedLetter.toUpperCase() && foundLetters[i] === undefined) {
         foundLetters[i] = i;
         found = true;
         break

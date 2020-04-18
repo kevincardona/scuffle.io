@@ -8,7 +8,7 @@ export default class Leaderboard extends PureComponent {
     this.state = {}
   }
   render() {
-    const {socket, players, unflipped, steal, room, toggleInviteModal, toggleInfoModal} = this.props
+    const {socket, players, unflipped, steal, room, toggleInviteModal, toggleInfoModal, toggleSettingsModal} = this.props
     return (
       <div id="leaderboard">
         <div className="leaderboard__header">

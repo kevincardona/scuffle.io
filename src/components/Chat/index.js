@@ -34,6 +34,7 @@ export default class Chat extends Component {
     const {socket} = this.props
     if (event)
       event.preventDefault();
+    if (this.state.input )
     if (this.state.input)
       sendMessage(socket, this.state.input)
     this.setState({input: ""})

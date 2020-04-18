@@ -35,7 +35,7 @@ export default class Room extends Component {
       room: room 
     })
     socket.on('disconnect',() => {
-      alert("Disconnected from room!")
+      //alert("Disconnected from room!")
       window.location.reload()
       this.setState({loading: true})
     })

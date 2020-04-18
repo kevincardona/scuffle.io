@@ -60,6 +60,8 @@ const Modal = ({header, type, prompt, isOpen, close, submit, copy}) => {
                   To read the rules type <b className="modal__command">/rules</b> in chat.<br/>          
                   (don't worry noone else will see)
                   <br/><br/>
+                  To steal someone's word click on it and type your new word!
+                  <br/><br/>
                 </p>
               </Fragment>
               }
@@ -68,11 +70,13 @@ const Modal = ({header, type, prompt, isOpen, close, submit, copy}) => {
                 <h5>Commands</h5>
                 <br/>
                 <p>
-                  To reset the game type <b className="modal__command">/reset_game</b>
+                  To reset the game type <b className="modal__command">/reset</b>
                   <br/><br/>
-                  To put one of your words back type <b className="modal__command">/put_back {"<word>"}</b>
+                  To put one of your words back type <b className="modal__command">/return {"<word>"}</b>
                   <br/><br/>
                   To override an invalid word type <b className="modal__command">/override {"<word>"}</b>
+                  <br/><br/>
+                  To enable sound type <b className="modal__command">/sound</b>
                   <br/><br/>
                 </p>
               </Fragment>

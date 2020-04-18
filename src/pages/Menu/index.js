@@ -8,12 +8,19 @@ const Menu = (props) => {
   const [nickname, setNickname] = useState('')
   const [isPrivate, setIsPrivate] = useState(true)
   const [disabled, setDisabled] = useState(false)
-  const [isPlaying, setIsPlaying] = useState(false)
+  const [isPlaying, setIsPlaying] = useState(true)
 
   useEffect(()=>{
+    window.addEventListener('keydown', downHandler)
     setRoom(props?.match?.params?.room);
     setDisabled(props?.match?.params?.room != null)
   }, [props])
+
+  const downHandler = ({ key }) => {
+    if (key === 'Enter') {
+      setIsPlaying(true);
+    }
+  }
 
   const togglePrivate = () => {
     setIsPrivate(!isPrivate); 
@@ -31,6 +38,7 @@ const Menu = (props) => {
       <input 
         type="text" 
         className="input-group-text mb-2" 
+        autoComplete="off"
         id="nickname-input" 
         placeholder="Nickname" 
         value={nickname} 
@@ -44,6 +52,7 @@ const Menu = (props) => {
             </label>
             <input
               type="checkbox"
+              autoComplete="off"
               value={isPrivate}
               onClick={togglePrivate}
               defaultChecked

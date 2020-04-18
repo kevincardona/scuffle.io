@@ -37,6 +37,15 @@
       border-radius: 5px;
       height: 1.875rem;
     }
+    &--settings {
+      margin: .625em;
+      border-radius: 5px;
+      width: 30vw;
+      height: 2em;
+      background-image: url("/settings.svg");
+      background-repeat: no-repeat;
+
+    }
   }
 
   &__info {
