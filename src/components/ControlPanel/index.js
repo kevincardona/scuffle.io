@@ -28,12 +28,12 @@ export default class ControlPanel extends Component {
   }
 
   render () {
-    const {children, create, unflipped, finished} = this.props
+    const {children, create, unflipped, finished, socket, currentPlayer} = this.props
     return (
     <div id="control-panel__container">
       <div id="control-panel">
         <div id="control-panel__buttons">
-          { unflipped !== 0 
+          { unflipped !== 0 && currentPlayer === socket.id
               ? 
               <Fragment>
                 <button className="control__button control__button--flip" onClick={this.sendFlip}>
@@ -41,13 +41,13 @@ export default class ControlPanel extends Component {
                 </button>
               </Fragment>
               :
-              !finished
+              !finished && unflipped === 0
                 ?
                   <button className="control__button control__button--finished" onClick={this.toggleFinished}>
                     Finished
                   </button>
                 :
-                  <button className="control__button control__button--waiting" onClick={this.toggleFinished}>
+                  <button className="control__button control__button--waiting">
                     Waiting...
                   </button>
           } 

@@ -29,20 +29,23 @@ export default class Leaderboard extends PureComponent {
           {
             players && players
               .sort((a, b)=>{
-                if (a.playerId === socket.id)
-                  return -1;
-                if (a.score > b.score)
-                  return -1;
-                if (b.score > a.score)
-                  return 1;
+                if (a.playerId === socket.id) return -1;
+                if (b.playerId === socket.id) return 1;
+                if (a.score > b.score) return -1;
+                if (b.score > a.score) return 1;
                 return 0;
               })
               .map((player, index)=>{
               return (
-                <div key={index} className="player">
+                <div key={index} className={`player color--${index%7}`}>
                   <div className="player__header" >
-                    <div className="player__header--name">
-                      {player.nickname}
+                    <div className="player__header--name">                  
+                      {player.playerId === socket.id 
+                        ?
+                        "YOU"
+                        :
+                        player.nickname
+                      }
                     </div>
                     <div className="player__header--score">
                       POINTS: {player.score ? player.score : 0}

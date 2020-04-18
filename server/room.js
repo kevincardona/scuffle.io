@@ -51,6 +51,25 @@ class Room {
     this.generateTable();
   }
 
+  getCurrentPlayer() {
+    return this.players[this.playerOrder[this.currentPlayer % this.playerOrder.length]]
+  }
+
+  getCurrentPlayerId() {
+    return this.playerOrder[this.currentPlayer % this.playerOrder.length]
+  }
+
+  setCurrentPlayer(playerId) {
+    const index = this.playerOrder.indexOf(playerId)
+    if (index >= 0)
+      this.currentPlayer = this.playerOrder.indexOf(playerId)
+  }
+
+  nextPlayer() {
+    const index = this.currentPlayer + 1
+    this.currentPlayer = index
+  }
+
   getRoomData() {
     const players = Object.keys(this.players).map((player) =>this.players[player].getPlayerData())
     const data = {
@@ -59,7 +78,7 @@ class Room {
       unflippedCount: this.unflipped.length,
       flipped: this.flipped,
       players: players,
-      currentPlayer: this.playerOrder[this.currentPlayer % this.playerOrder.length]
+      currentPlayer: this.getCurrentPlayerId()
     }
     
     return data;
@@ -79,6 +98,7 @@ class Room {
     this.sendServerMessage(`${data.player} flipped the letter ${newLetter}`)
     if (this.unflipped.length === 0)
       this.sendServerMessage(`There are no letters left to flip! If you don't see any more words to create/steal click the "Finished" button to end the game!`)
+    this.nextPlayer()
   }
 
   overrideWord(data, word) {
@@ -114,6 +134,7 @@ class Room {
       this.players[data.playerId].addWord(word)
       this.takeFromCenter(letterIndex)
       this.sendServerMessage(`${player.nickname} made the word: ${word.toUpperCase()}`)
+      this.setCurrentPlayer(data.playerId)
       return true;
     } else if (letterIndex !== false) {
       this.takeFromCenter(letterIndex)
@@ -139,6 +160,7 @@ class Room {
     if (this.createWord(data, helpers.letterMapToWord(difference), true)) {
       this.players[data.playerId].addWord(newWord);
       this.players[victim].removeWord(oldWord);
+      this.setCurrentPlayer(data.playerId)
       return this.sendServerMessage(`${this.players[data.playerId].nickname} stole the word: ${oldWord} to create: ${newWord}!!!`)
     }
     this.sendServerMessage(`${this.players[data.playerId].nickname} attempted to steal the word: ${oldWord} to create the INVALID word: ${newWord}`);
@@ -213,7 +235,8 @@ class Room {
   handlePlayerCommand(data, command, args) {
     switch(command) {
       case Constants.COMMANDS.FLIP:
-        this.flipTile(data); 
+        if (this.getCurrentPlayerId() === data.playerId)
+          this.flipTile(data); 
         break;
       case Constants.COMMANDS.CREATE_WORD:
         this.createWord(data, args[0]); 

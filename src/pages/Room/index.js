@@ -50,6 +50,7 @@ export default class Room extends Component {
   updateRoom = (data) => {
     this.setState({
       loading: false,
+      currentPlayer: data.currentPlayer,
       players: data.players,
       unflipped: data.unflippedCount,
       flipped: data.flipped,
@@ -120,7 +121,7 @@ export default class Room extends Component {
   }
 
   render() {
-    const {socket, loading, flipped, players, room, unflipped, isFinished, isModalOpen, modalData} = this.state
+    const {socket, loading, flipped, players, room, unflipped, isFinished, isModalOpen, modalData, currentPlayer} = this.state
     if (loading) {
       return (
         <div className="loading">
@@ -155,7 +156,14 @@ export default class Room extends Component {
               })
             }
           </div>
-          <ControlPanel socket={socket} create={this.triggerCreate} unflipped={unflipped} finished={isFinished} setFinished={this.setFinished}>
+          <ControlPanel 
+            socket={socket} 
+            create={this.triggerCreate} 
+            unflipped={unflipped} 
+            finished={isFinished} 
+            setFinished={this.setFinished}
+            currentPlayer={currentPlayer}
+          >
             <Chat socket={socket}/>
           </ControlPanel>
         </div>

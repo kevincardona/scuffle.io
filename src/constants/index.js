@@ -56,7 +56,8 @@ module.exports = Object.freeze({
       X: 2,
       Y: 3,
       Z: 2
-    }
+    },
+    TURN_TIMEOUT: 15000
   },
   SERVER_PROMPTS: {
     RULES: 

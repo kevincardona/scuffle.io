@@ -4,23 +4,24 @@ import Room from '../Room';
 import './menu.scss'
 
 const Menu = (props) => {
-  const [room, setRoom] = useState();
+  const [room, setRoom] = useState('');
   const [nickname, setNickname] = useState('')
   const [isPrivate, setIsPrivate] = useState(true)
   const [disabled, setDisabled] = useState(false)
-  const [isPlaying, setIsPlaying] = useState(true)
+  const [isPlaying, setIsPlaying] = useState(false)
 
   useEffect(()=>{
-    window.addEventListener('keydown', downHandler)
     setRoom(props?.match?.params?.room);
     setDisabled(props?.match?.params?.room != null)
   }, [props])
 
   const downHandler = ({ key }) => {
-    if (key === 'Enter') {
+    if (key === 'Enter' && nickname && (isPrivate || room !== null)) {
       setIsPlaying(true);
     }
   }
+
+  window.addEventListener('keydown', downHandler)
 
   const togglePrivate = () => {
     setIsPrivate(!isPrivate); 

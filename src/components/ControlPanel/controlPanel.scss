@@ -72,12 +72,13 @@
   outline: none;
 }
 
-@media screen and (max-width: 31.25rem), screen and (max-height: 25rem){
+@media screen and (max-width: 31.25rem) {
   #control-panel__container {
     position: fixed;
     width: 100vw;
     height: 40vh;
     bottom: 0%;
     left: 0%;
+    margin: auto;
   }
 }

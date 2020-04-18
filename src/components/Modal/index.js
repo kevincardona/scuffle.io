@@ -76,8 +76,6 @@ const Modal = ({header, type, prompt, isOpen, close, submit, copy}) => {
                   <br/><br/>
                   To override an invalid word type <b className="modal__command">/override {"<word>"}</b>
                   <br/><br/>
-                  To enable sound type <b className="modal__command">/sound</b>
-                  <br/><br/>
                 </p>
               </Fragment>
               }
