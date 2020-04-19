@@ -1,5 +1,6 @@
 import React, {Fragment, useState, useEffect} from 'react';
 import {Link} from 'react-router-dom'
+import queryString from 'query-string';
 import {apiGet} from '../../util/api';
 import Room from '../Room';
 import './menu.scss'
@@ -17,8 +18,9 @@ const Menu = (props) => {
       if (res.success)
         setPlayerCount(res.playerCount)
     })
-    setRoom(props?.match?.params?.room);
-    setDisabled(props?.match?.params?.room != null)
+    const params = queryString.parse(props.location.search)
+    setRoom(params.room);
+    setDisabled(params.room != null)
   }, [props])
 
   const downHandler = ({ key }) => {

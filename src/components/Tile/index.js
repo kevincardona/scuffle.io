@@ -24,7 +24,7 @@ const Tile = ({letter, onFlip, onClick}) => {
         <p className='tile__letter'>{tileLetter}</p>
       </div>
       { sound &&
-        <Sound url={process.env.PUBLIC_URL + "/flip.wav"} delay={100} volume={0.1}/>
+        <Sound url={process.env.PUBLIC_URL + "sounds/flip.wav"} delay={100} volume={0.1}/>
       }
     </div>
   );

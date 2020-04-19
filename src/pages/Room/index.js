@@ -8,6 +8,7 @@ import Modal from '../../components/Modal';
 import Tile from '../../components/Tile';
 import './room.scss';
 
+const TRAILING_TILES = 20;
 export default class Room extends Component {
   constructor(props) {
     super(props);
@@ -96,7 +97,7 @@ export default class Room extends Component {
       type: 'invite',
       header: `Inviting a Friend`,
       prompt: `To invite a friend send them this link: `,
-      copy:  `http://${window.location.host}/#/invite/${this.state.roomId}`,
+      copy:  `http://${window.location.host}/#/play?room=${this.state.roomId}`,
       submit: null,
       close: this.closeModal
     }
@@ -150,7 +151,7 @@ export default class Room extends Component {
               [...Array(flipped.length + unflipped)].map((_, i) => {
                 if (i < flipped.length)
                   return <Tile key={i} letter={flipped[i]}/>
-                if (i < flipped.length + 20)
+                if (i < flipped.length + TRAILING_TILES)
                   return <Tile key={i} onClick={() => {triggerAction(socket, {command: Constants.COMMANDS.FLIP})}}/>
                 return null
               })

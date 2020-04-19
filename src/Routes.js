@@ -8,7 +8,7 @@ function Routes() {
   return (
     <Router>
       <Switch>
-        <Route exact path={['/invite/:room', '/play']} component={Menu} />
+        <Route exact path={['/play']} component={Menu} />
         <Route path={['/about', '/home', '*']} component={Home} />
       </Switch>
     </Router>
