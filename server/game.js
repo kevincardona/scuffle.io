@@ -9,9 +9,12 @@ class Game {
     this.io = io
     this.players = {};
     this.rooms = {};
-    this.playerCount = 0;
     this.lastUpdateTime = Date.now();
     this.shouldSendUpdate = false;
+  }
+
+  getPlayerCount() {
+    return Object.keys(this.players).length
   }
 
   getPlayerRoom(socket) {
@@ -65,7 +68,6 @@ class Game {
       socket: socket,
       room: room
     }
-    this.playerCount = this.playerCount + 1
   }
 
   leaveRoom(socket) {
@@ -87,7 +89,6 @@ class Game {
     logger.info(`Removing player with socket id: ${socket.id}`)
     this.leaveRoom(socket)
     delete this.players[socket.id];
-    this.playerCount = this.playerCount - 1
   }
 }
 

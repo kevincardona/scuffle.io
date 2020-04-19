@@ -31,7 +31,7 @@ const server = app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
 
-app.get('/api/playercount', (_, res) => {res.send({success: true, playerCount: game.playerCount})})
+app.get('/api/playercount', (_, res) => {res.send({success: true, playerCount: game.getPlayerCount()})})
 
 const io = socketio(server);
 io.on('connection', socket => {
