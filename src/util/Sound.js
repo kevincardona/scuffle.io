@@ -1,24 +1,33 @@
 import { Component } from 'react'
 
-class Sound extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      play: false
-    }
-    this.audio = new Audio(this.props.url)
-  }
-  componentDidMount() {
-    /*
-    setTimeout(() => {
-      this.audio.volume = this.props.volume || 0.3
-      this.audio.play()
-    }, this.props.delay)
-    */
-  }
-  render() {
-    return null;
-  }
+if (localStorage.getItem('soundEnabled') == undefined) {
+  localStorage.setItem('soundEnabled', true)
+}
+let soundEnabled = localStorage.getItem('soundEnabled')
+
+const enabled = () => {
+  return soundEnabled
 }
 
-export default Sound;
+const toggle = (soundBool) => {
+  if (soundBool != null) {
+    soundEnabled = soundBool
+  } else {
+    soundEnabled = !soundEnabled
+  }
+  localStorage.setItem('soundEnabled', soundEnabled)
+}
+
+const play = (soundFile, volume = 0.3, delay = 0) => {
+  const sound = new Audio(soundFile)
+  sound.volume = volume
+  setTimeout(() => {
+    sound.play();
+  }, delay)
+}
+
+export default {
+  play: play,
+  toggle: toggle,
+  enabled: enabled
+}

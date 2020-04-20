@@ -67,6 +67,7 @@
       display: flex;
       flex-wrap: wrap;
       overflow-y: auto;
+      align-content: flex-start;
       justify-content: space-around;
       background-color: rgb(94, 94, 94);
       border: solid 2px gray;
@@ -106,6 +107,9 @@ $colors: #9e080840, #80089e40, #081b9e40, #089e9040, #0b9e0840, #9e990840, #9e4d
     justify-content: center;
     border-radius: 10px;
   }
+  &--current {
+    border: solid 2px white;
+  }
 }
 
 @for $i from 1 through length($colors){
@@ -126,7 +130,7 @@ $colors: #9e080840, #80089e40, #081b9e40, #089e9040, #0b9e0840, #9e990840, #9e4d
     }
     &__players {
       &--words {
-        height: 40vh;
+        height: 60vh;
       }
     }
   }

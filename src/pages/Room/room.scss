@@ -56,22 +56,6 @@
   margin: auto;
 }
 
-@media screen and (max-width: 500px) {
-  #room {
-    overflow: hidden;
-  }
-  .panel {
-    &--right {
-      width: 50vw;
-      height: 60vh;
-    }
-    &--left {
-      width: 50vw;
-      height: 60vh;
-    }
-  }
-}
-
 #letters--container::-webkit-scrollbar {
   display: none;
 }
@@ -95,4 +79,20 @@
 .loader {
   width: 30vw;
   height: auto;
+}
+
+@media screen and (max-width: 500px) {
+  #room {
+    overflow: hidden;
+  }
+  .panel {
+    &--right {
+      width: 50vw;
+      height: 75vh;
+    }
+    &--left {
+      width: 50vw;
+      height: 75vh;
+    }
+  }
 }

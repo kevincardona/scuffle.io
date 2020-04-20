@@ -28,7 +28,7 @@ export default class ControlPanel extends Component {
   }
 
   render () {
-    const {children, create, unflipped, finished, socket, currentPlayer} = this.props
+    const {children, togglePopup, unflipped, finished, socket, currentPlayer} = this.props
     return (
     <div id="control-panel__container">
       <div id="control-panel">
@@ -52,7 +52,7 @@ export default class ControlPanel extends Component {
                   </button>
           } 
           { !finished &&
-              <button className="control__button control__button--create" onClick={create}>
+              <button className="control__button control__button--create" onClick={()=>togglePopup('create')}>
                 Create Word
               </button>
           }

@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
+import popup from '../../util/popup';
 import {getSocket, joinRoom, leaveRoom, triggerAction} from '../../util/api';
 import Constants from '../../constants';
 import ControlPanel from '../../components/ControlPanel';
 import Leaderboard from '../../components/Leaderboard';
 import Chat from '../../components/Chat';
-import Modal from '../../components/Modal';
 import Tile from '../../components/Tile';
 import './room.scss';
 
@@ -14,8 +14,6 @@ export default class Room extends Component {
     super(props);
     this.state = {
       loading: true,
-      isModalOpen: false,
-      modalData: null,
       socket: null,
       isFinished: false
     }
@@ -36,7 +34,6 @@ export default class Room extends Component {
       room: room 
     })
     socket.on('disconnect',() => {
-      //alert("Disconnected from room!")
       window.location.reload()
       this.setState({loading: true})
     })
@@ -66,50 +63,22 @@ export default class Room extends Component {
     this.setState({isFinished: finished})
   }
 
-  closeModal = () => { this.setState({ isModalOpen: false, modalData: null }) }
-
-  triggerSteal = (player) => {
+  togglePopup = (type, data = {}) => {
     const {socket} = this.state
-    let modalData = {
-      type: 'input',
-      header: `Steal Word: ${player.word}`,
-      prompt: `New Word`,
-      submit: (word)=>{triggerAction(socket, {command: Constants.COMMANDS.STEAL_WORD, args: [player, word]});},
-      close: this.closeModal
+    switch (type) {
+      case 'invite':
+        data = {link: `http://${window.location.host}/#/play?room=${this.state.roomId}`}
+        break;
+      case 'create':
+        data = {
+          submit: (word) => { triggerAction(socket, { command: Constants.COMMANDS.CREATE_WORD, args: [word] }) }
+        }
+        break;
+      case 'steal':
+        data.submit = (word) => { triggerAction(socket, { command: Constants.COMMANDS.STEAL_WORD, args: [data.player, word] }) }
+        break;
     }
-    this.setState({isModalOpen: true, modalData: modalData})
-  }
-
-  triggerCreate = () => {
-    const {socket} = this.state
-    let modalData = {
-      type: 'input',
-      header: `Create Word`,
-      prompt: `New Word`,
-      submit: (word) => {triggerAction(socket, { command: Constants.COMMANDS.CREATE_WORD, args: [word]});},
-      close: this.closeModal
-    }
-    this.setState({ isModalOpen: true, modalData: modalData })
-  }
-
-  toggleInvite = () => {
-    let modalData = {
-      type: 'invite',
-      header: `Inviting a Friend`,
-      prompt: `To invite a friend send them this link: `,
-      copy:  `http://${window.location.host}/#/play?room=${this.state.roomId}`,
-      submit: null,
-      close: this.closeModal
-    }
-    this.setState({ isModalOpen: true, modalData: modalData })
-  }
-
-  toggleInfo = () => {
-    let modalData = {
-      type: 'info',
-      close: this.closeModal
-    }
-    this.setState({ isModalOpen: true, modalData: modalData })
+    popup(type, data)
   }
 
   sendFlipCommand = () => {
@@ -138,14 +107,12 @@ export default class Room extends Component {
             socket={socket}
             players={players} 
             unflipped={unflipped} 
-            steal={this.triggerSteal} 
-            room={room} 
-            toggleInviteModal={this.toggleInvite} 
-            toggleInfoModal={this.toggleInfo}
+            togglePopup={this.togglePopup} 
+            room={room}
+            currentPlayer={currentPlayer}
           />
         </div>
         <div className="panel--right">
-          <Modal {...modalData} isOpen={isModalOpen} />
           <div id="letters--container">
             {
               [...Array(flipped.length + unflipped)].map((_, i) => {
@@ -159,7 +126,7 @@ export default class Room extends Component {
           </div>
           <ControlPanel 
             socket={socket} 
-            create={this.triggerCreate} 
+            togglePopup={this.togglePopup} 
             unflipped={unflipped} 
             finished={isFinished} 
             setFinished={this.setFinished}

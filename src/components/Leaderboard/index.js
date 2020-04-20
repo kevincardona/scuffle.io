@@ -8,14 +8,14 @@ export default class Leaderboard extends PureComponent {
     this.state = {}
   }
   render() {
-    const {socket, players, unflipped, steal, room, toggleInviteModal, toggleInfoModal} = this.props
+    const {socket, players, currentPlayer, unflipped, togglePopup, room} = this.props
     return (
       <div id="leaderboard">
         <div className="leaderboard__header">
           <h2>{room}</h2>
           <div className="leaderboard__header--buttons">
-            <button className="leaderboard__button--invite" onClick={toggleInviteModal}>INVITE FRIEND</button>
-            <button className="leaderboard__button--help" onClick={toggleInfoModal}>HELP</button>
+            <button className="leaderboard__button--invite" onClick={()=>togglePopup('invite')}>INVITE FRIEND</button>
+            <button className="leaderboard__button--help" onClick={()=>togglePopup('help')}>HELP</button>
           </div>
         </div>
         <h4 className="leaderboard__players--header">
@@ -37,7 +37,7 @@ export default class Leaderboard extends PureComponent {
               })
               .map((player, index)=>{
               return (
-                <div key={index} className={`player color--${index%7}`}>
+                <div key={index} className={`player color--${index%7} ${currentPlayer === player.playerId ? 'player--current':''}`}>
                   <div className="player__header" >
                     <div className="player__header--name">                  
                       {player.playerId === socket.id 
@@ -55,7 +55,7 @@ export default class Leaderboard extends PureComponent {
                     {
                       player.words && player.words.map((word, index)=> {
                         return (
-                          <Word key={index} className="player__word" word={word} onClick={() => steal({ ...player, word: word })}/>
+                          <Word key={index} className="player__word" word={word} onClick={() => togglePopup('steal', { player: {...player, word: word }})}/>
                         )
                       })
                     }

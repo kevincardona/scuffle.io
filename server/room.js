@@ -124,10 +124,8 @@ class Room {
     }
     if (words.check(word.toLowerCase()) || this.overrides[word] != null)
       return true
-
     if (!stealing)
       this.sendServerMessage(`${this.players[data.playerId].nickname} tried to make the INVALID word ${word.toUpperCase()}`)
-    this.sendPrivateMessage(this.getSocket(data.playerId), 'That\'s not a real word! To allow this word type /override word')
     return false
   }
 
@@ -159,7 +157,10 @@ class Room {
     let newWordMap = helpers.letterCountMap(newWord)
     let oldWordMap = helpers.letterCountMap(oldWord)
     const difference = helpers.checkWordContainsOther(newWordMap, oldWordMap)
-    if (!difference ||  !this.isValidWord(data, newWord)) {
+    if (!this.players[victim]|| !this.players[victim].hasWord(oldWord)) {
+      return this.sendPrivateMessage(data.playerId, `Seems like someone must have taken that word before you!`)
+    }
+    if (!difference ||  !this.isValidWord(data, newWord, true)) {
       return this.sendServerMessage(`${this.players[data.playerId].nickname} attempted to steal the word: ${oldWord} to create the invalid word: ${newWord}`);
     }
     if (this.createWord(data, helpers.letterMapToWord(difference), true)) {
