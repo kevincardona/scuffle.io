@@ -14,14 +14,8 @@
   line-height: 3.125rem;
 }
 
-.tile--flipped:hover {
-  animation: shake 0.3s;
-}
-
 .tile--unflipped {
   transform: rotateY(180deg);
-  /*animation-duration: 1s;
-  animation-name: slidein;*/
 }
 
 .tile__face {
@@ -43,18 +37,6 @@
   backface-visibility: hidden;
   animation-duration: 0.3s;
   transform: rotateY( 180deg );
-}
-
-@keyframes slidein {
-  from {
-    opacity: 0.0;
-    transform: translateY(15px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0px);
-
-  }
 }
 
 @keyframes shake {

@@ -91,7 +91,7 @@ export default class Room extends Component {
   }
 
   render() {
-    const {socket, loading, flipped, players, room, unflipped, isFinished, isModalOpen, modalData, currentPlayer} = this.state
+    const {socket, loading, flipped, players, room, unflipped, isFinished, currentPlayer} = this.state
     if (loading) {
       return (
         <div className="loading">
