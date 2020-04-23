@@ -70,6 +70,5 @@ module.exports = Object.freeze({
         WINNING
         When all of the letters from the center have been flipped and nobody has any steals/words to create using the center letters then the game is over. The player with the most letters wins the game.
       `,
-    COMMANDS: `There are no other commands at this time!`
   },
 })

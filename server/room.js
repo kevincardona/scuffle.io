@@ -272,9 +272,6 @@ class Room {
       case Constants.COMMANDS.RULES:
         this.sendPrivateMessage(this.getSocket(data.playerId), Constants.SERVER_PROMPTS.RULES);
         break;
-      case Constants.COMMANDS.HELP:
-        this.sendPrivateMessage(this.getSocket(data.playerId), Constants.SERVER_PROMPTS.COMMANDS);
-        break;
       default:
         this.sendPrivateMessage(this.getSocket(data.playerId), `Command not found!`);
         break;
