@@ -7,8 +7,7 @@ module.exports = Object.freeze({
     STEAL_WORD: 'STEAL_WORD',
     RESET: 'RESET',
     DONE: 'DONE',
-    RULES: 'RULES',
-    HELP: 'HELP'
+    RULES: 'RULES'
   },
   MSG_TYPES: {
     CREATE_ROOM: 'create_room',
@@ -56,8 +55,7 @@ module.exports = Object.freeze({
       X: 2,
       Y: 3,
       Z: 2
-    },
-    TURN_TIMEOUT: 15000
+    }
   },
   SERVER_PROMPTS: {
     RULES: 
