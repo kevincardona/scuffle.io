@@ -43,14 +43,14 @@ const Menu = (props) => {
     <div id="play-menu">
       <div className="title">
         <h1>Scuffle</h1>
-        <p className="play-menu__header--count">{playerCount} online</p>
+        { !disabled && <p className="play-menu__header--count">{playerCount} online</p> }
       </div> 
       <input 
         type="text" 
         className="input-group-text mb-2" 
         autoComplete="off"
         id="nickname-input" 
-        placeholder="Nickname" 
+        placeholder="Enter your name" 
         value={nickname} 
         onChange={e => setNickname(e.target.value)} 
         maxLength="15"
@@ -84,16 +84,16 @@ const Menu = (props) => {
         />
       }
       <div id="menu-buttons">
-        { (room && nickname) || (nickname && isPrivate) ?
-          <span className="button--link" onClick={()=>setIsPlaying(true)}>
-            <button type="button" className="btn btn-primary menu-button">PLAY</button>
-          </span>
-          :
-          <button type="button" className="btn btn-primary menu-button" disabled>PLAY</button>
+        <span className="button--link" onClick={()=>setIsPlaying(true)}>
+          <button type="button" className="btn btn-primary menu-button" disabled={!((isPrivate || room) && nickname)}>
+            { disabled ? "JOIN GAME" : "PLAY" }
+          </button>
+        </span>
+        { !disabled &&
+          <Link className="button--link" to={`/about`}>
+            <button type="button" className="btn btn-secondary menu-button">RULES</button>
+          </Link>
         }
-        <Link className="button--link" to={`/about`}>
-          <button type="button" className="btn btn-secondary menu-button">RULES</button>
-        </Link>
       </div>
     </div>
   )

@@ -77,6 +77,7 @@ export default class Room extends Component {
       case 'steal':
         data.submit = (word) => { triggerAction(socket, { command: Constants.COMMANDS.STEAL_WORD, args: [data.player, word] }) }
         break;
+      default:
     }
     popup(type, data)
   }

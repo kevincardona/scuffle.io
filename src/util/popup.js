@@ -21,6 +21,7 @@ const popup = (type, data = {}) => {
     case 'win':
       winNotification(data);
       break;
+    default:
   }
 } 
 

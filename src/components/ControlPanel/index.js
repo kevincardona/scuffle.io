@@ -48,7 +48,7 @@ export default class ControlPanel extends Component {
                   </button>
                 :
                   <button className="control__button control__button--waiting">
-                    Waiting...
+                    Waiting for turn...
                   </button>
           } 
           { !finished &&
