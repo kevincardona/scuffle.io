@@ -50,10 +50,10 @@ export const leaveRoom = (socket) => {
   socket.emit(Constants.MSG_TYPES.LEAVE_ROOM);
 }
 
-export const joinRoom = (socket, room, nickname) => {
+export const joinRoom = (socket, room, nickname, isPrivate) => {
   if (!socket)
     return
-  socket.emit(Constants.MSG_TYPES.JOIN_ROOM, {room: room, nickname: nickname});
+  socket.emit(Constants.MSG_TYPES.JOIN_ROOM, {room: room, nickname: nickname, isPrivate: isPrivate});
 }
 
 export const sendMessage = (socket, message) => {

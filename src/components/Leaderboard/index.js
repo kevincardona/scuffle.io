@@ -14,7 +14,7 @@ export default class Leaderboard extends PureComponent {
         <div className="leaderboard__header">
           <h2>{room}</h2>
           <div className="leaderboard__header--buttons">
-            <button className="leaderboard__button--invite" onClick={()=>togglePopup('invite')}>INVITE FRIEND</button>
+            <button className="leaderboard__button--invite" onClick={()=>togglePopup('invite')}>INVITE</button>
             <button className="leaderboard__button--help" onClick={()=>togglePopup('help')}>HELP</button>
           </div>
         </div>
@@ -38,14 +38,9 @@ export default class Leaderboard extends PureComponent {
               .map((player, index)=>{
               return (
                 <div key={index} className={`player color--${index%7} ${currentPlayer === player.playerId ? 'player--current':''}`}>
-                  <div className="player__header" >
-                    <div className="player__header--name">                  
-                      {player.playerId === socket.id 
-                        ?
-                        "YOU"
-                        :
-                        player.nickname
-                      }
+                  <div className="player__header" disabled={!player.active}>
+                    <div className="player__header--name" >                  
+                      {player.nickname}
                     </div>
                     <div className="player__header--score">
                       POINTS: {player.score ? player.score : 0}
@@ -55,7 +50,7 @@ export default class Leaderboard extends PureComponent {
                     {
                       player.words && player.words.map((word, index)=> {
                         return (
-                          <Word key={index} className="player__word" word={word} onClick={() => togglePopup('steal', { player: {...player, word: word }})}/>
+                          <Word key={index} word={word} onClick={() => togglePopup('steal', { player: {...player, word: word }})}/>
                         )
                       })
                     }

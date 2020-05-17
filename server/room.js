@@ -10,25 +10,32 @@ class Room {
     this.id = id;
     this.privateRoom = privateRoom
     this.playerCount = 0
-    this.players = {};
+    this.players = {}
     this.playerOrder = []
     this.overrides = {}
     this.currentPlayer = 0
     this.flipped = new Array(Constants.GAME.TILE_COUNT)
     this.currentPlayer = null;
     this.io = io
+    this.turnTimeout = null
     this.updateInterval = setInterval(this.update.bind(this), 2000);
     this.generateTable()
   }
 
+  isEmpty() {
+    return this.activePlayerCount() === 0
+  }
+
+  activePlayerCount() {
+   return Object.keys(this.players).reduce((total, playerId) => {
+      if (this.players[playerId].active)
+        return total + 1;
+      return total
+    }, 0)
+  }
+
   destroy() {
     clearInterval(this.updateInterval)
-    delete this.id
-    delete this.playerCount
-    delete this.players
-    delete this.overrides
-    delete this.flipped
-    delete this.currentPlayer
     delete this
   }
 
@@ -49,6 +56,17 @@ class Room {
       this.players[player].score = 0;
     })
     this.generateTable();
+    this.removeInactivePlayers();
+  }
+
+  removeInactivePlayers() {
+    this.playerOrder.forEach((playerId, index) => {
+      let player = this.players[playerId]
+      if (player.active) return 
+      this.playerOrder.splice(this.playerOrder.indexOf(playerId),1);
+      this.playerCount--;
+      delete this.players[playerId]
+    })
   }
 
   getCurrentPlayer() {
@@ -56,6 +74,9 @@ class Room {
   }
 
   getCurrentPlayerId() {
+    const player = this.playerOrder[this.currentPlayer % this.playerOrder.length]
+    if (!this.players[player].active)
+      this.nextPlayer()
     return this.playerOrder[this.currentPlayer % this.playerOrder.length]
   }
 
@@ -66,14 +87,23 @@ class Room {
   }
 
   nextPlayer() {
-    const index = this.currentPlayer + 1
-    this.currentPlayer = index
+    clearTimeout(this.turnTimeout)
+    this.currentPlayer = (this.currentPlayer + 1) % this.playerOrder.length
+    if (this.unflipped.length !== 0) {
+      this.sendRoomMessage(`${this.getCurrentPlayer().nickname}'s turn!`)
+      this.turnTimeout = setTimeout(()=> {
+        this.sendRoomMessage(`${this.getCurrentPlayer().nickname} took to long to go! Who's next?`)
+        this.nextPlayer()
+      }, Constants.GAME.TURN_TIMEOUT)
+    }
+    if (!this.getCurrentPlayer().active)
+      return this.nextPlayer();
   }
 
   getRoomData() {
     const players = Object.keys(this.players).map((player) =>this.players[player].getPlayerData())
     const data = {
-      roomName: this.privateRoom ? "Private Room" : this.id,
+      roomName: this.privateRoom ? "Private Game" : this.id,
       roomId: this.id,
       unflippedCount: this.unflipped.length,
       flipped: this.flipped,
@@ -87,24 +117,24 @@ class Room {
   getSocket(playerId) {return this.players[playerId].socket}
 
   update() {
-    const currentPlayer = this.getRoomData()
-    this.io.in(this.id).emit(Constants.MSG_TYPES.GAME_UPDATE, currentPlayer)    
+    if (!this.isEmpty())
+      this.io.in(this.id).emit(Constants.MSG_TYPES.GAME_UPDATE, this.getRoomData())    
   }
 
   flipTile(data) {
     let newLetter = this.unflipped.pop()
     if (!newLetter) return
     this.flipped.push(newLetter);
-    this.sendServerMessage(`${data.player} flipped the letter ${newLetter}`)
+    this.sendRoomMessage(`${data.player} flipped the letter ${newLetter}`)
     if (this.unflipped.length === 0)
-      this.sendServerMessage(`There are no letters left to flip! If you don't see any more words to create/steal click the "Finished" button to end the game!`)
+      this.sendRoomMessage(`There are no letters left to flip! If you don't see any more words to create/steal click the "Finished" button to end the game!`)
     this.nextPlayer()
   }
 
   overrideWord(data, word) {
     if (this.privateRoom) {
       this.overrides[word.toLowerCase()] = true
-      this.sendServerMessage(`${this.players[data.playerId].nickname} has added the word: ${word} to the dictionary!`)
+      this.sendRoomMessage(`${this.players[data.playerId].nickname} has added the word: ${word} to the dictionary!`)
     }
   }
 
@@ -119,13 +149,13 @@ class Room {
     if ((word == null || (word.length < 3) && this.overrides[word] == null)) {
       this.sendPrivateMessage(this.getSocket(data.playerId), 'Your word needs to be real and at least 3 characters long!')
       if (!stealing)
-        this.sendServerMessage(`${this.players[data.playerId].nickname} tried to make the INVALID word ${word.toUpperCase()}`)
+        this.sendRoomMessage(`${this.players[data.playerId].nickname} tried to make the INVALID word ${word.toUpperCase()}`)
       return false
     }
     if (words.check(word.toLowerCase()) || this.overrides[word] != null)
       return true
     if (!stealing)
-      this.sendServerMessage(`${this.players[data.playerId].nickname} tried to make the INVALID word ${word.toUpperCase()}`)
+      this.sendRoomMessage(`${this.players[data.playerId].nickname} tried to make the INVALID word ${word.toUpperCase()}`)
     return false
   }
 
@@ -136,7 +166,7 @@ class Room {
     if (letterIndex !== false && !stealing) {
       this.players[data.playerId].addWord(word)
       this.takeFromCenter(letterIndex)
-      this.sendServerMessage(`${player.nickname} made the word: ${word.toUpperCase()}`)
+      this.sendRoomMessage(`${player.nickname} made the word: ${word.toUpperCase()}`)
       this.setCurrentPlayer(data.playerId)
       return true;
     } else if (letterIndex !== false) {
@@ -144,7 +174,7 @@ class Room {
       return true;
     } else {
       if (!stealing)
-        this.sendServerMessage(`${player.nickname} tried to make the word ${word.toUpperCase()}`)
+        this.sendRoomMessage(`${player.nickname} tried to make the word ${word.toUpperCase()}`)
       return false;
     }
   }
@@ -161,22 +191,22 @@ class Room {
       return this.sendPrivateMessage(data.playerId, `Seems like someone must have taken that word before you!`)
     }
     if (!difference ||  !this.isValidWord(data, newWord, true)) {
-      return this.sendServerMessage(`${this.players[data.playerId].nickname} attempted to steal the word: ${oldWord} to create the invalid word: ${newWord}`);
+      return this.sendRoomMessage(`${this.players[data.playerId].nickname} attempted to steal the word: ${oldWord} to create the invalid word: ${newWord}`);
     }
     if (this.createWord(data, helpers.letterMapToWord(difference), true)) {
       this.players[data.playerId].addWord(newWord);
       this.players[victim].removeWord(oldWord);
       this.setCurrentPlayer(data.playerId)
-      return this.sendServerMessage(`${this.players[data.playerId].nickname} stole the word: ${oldWord} to create: ${newWord}!!!`)
+      return this.sendRoomMessage(`${this.players[data.playerId].nickname} stole the word: ${oldWord} to create: ${newWord}!!!`)
     }
-    this.sendServerMessage(`${this.players[data.playerId].nickname} attempted to steal the word: ${oldWord} to create the INVALID word: ${newWord}`);
+    this.sendRoomMessage(`${this.players[data.playerId].nickname} attempted to steal the word: ${oldWord} to create the INVALID word: ${newWord}`);
   }
 
   putBackWord(data, word) {
     let player = this.players[data.playerId]
     if (player.hasWord(word)) {
       player.removeWord(word)
-      this.sendServerMessage(`${player.nickname} put ${word} back into the mix!`)
+      this.sendRoomMessage(`${player.nickname} put ${word} back into the mix!`)
       this.flipped = this.flipped.concat([...word])
     } else {
       return this.sendPrivateMessage(player.socket, `Failed to put back word ${word}! Are you sure that's not someone elses?`);
@@ -199,7 +229,7 @@ class Room {
         return total + 1;
       return total
     }, 0)
-    this.sendServerMessage(`${this.players[data.playerId].nickname} is done! ${done}/${this.playerOrder.length} players done.`)
+    this.sendRoomMessage(`${this.players[data.playerId].nickname} is done! ${done}/${this.playerOrder.length} players done.`)
     this.endGame();
   }
 
@@ -220,7 +250,7 @@ class Room {
       }
     }
     if (winners.length === 1)
-      this.sendServerMessage(`${winners[0].nickname} has won with ${topScore} points!`)
+      this.sendRoomMessage(`${winners[0].nickname} has won with ${topScore} points!`)
     else {
       let winnerNames = ''
       for (let i = 0; i < winners.length; i++) {
@@ -233,7 +263,7 @@ class Room {
         else 
           winnerNames = winnerNames + ' and ' + winners[i].nickname
       }
-      this.sendServerMessage(`${winnerNames} have tied for first with ${topScore} points!`)
+      this.sendRoomMessage(`${winnerNames} have tied for first with ${topScore} points!`)
     }
     this.resetGame()
   }
@@ -292,7 +322,7 @@ class Room {
     socket.emit(Constants.MSG_TYPES.MESSAGE, data)
   }
 
-  sendServerMessage(message) {
+  sendRoomMessage(message) {
     const data = {
       type: Constants.CHAT_MSG_TYPES.SERVER_MESSAGE,
       message: message
@@ -316,15 +346,14 @@ class Room {
     this.players[socket.id] = new Player(socket, nickname, this.id)
     this.playerOrder.push(socket.id);
     this.playerCount = this.playerCount + 1
-    this.sendServerMessage(`${nickname} has joined the room!`)
+    this.sendRoomMessage(`${nickname} has joined the room!`)
   }
 
   removePlayer(socket) {
     if (!this.players[socket.id]) return logger.error(`Attempted to remove nonexistent player: ${socket.id} from room: ${this.id}`)
-    this.playerOrder.splice(this.playerOrder.indexOf(socket.id),1);
-    this.playerCount = this.playerCount - 1
-    this.sendServerMessage(`${this.players[socket.id].nickname} has left the room!`)
-    delete this.players[socket.id]
+    this.players[socket.id].active = false
+    this.players[socket.id].isDone = true
+    this.sendRoomMessage(`${this.players[socket.id].nickname} has left the room!`)
   }
 }
 

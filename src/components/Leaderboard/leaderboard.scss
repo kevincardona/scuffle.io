@@ -37,6 +37,13 @@
       border-radius: 5px;
       height: 1.875rem;
     }
+    &--leave {
+      background-color: #ce1212;
+      border-radius: 5px;
+      color: white;
+      height: 1.875rem;
+      overflow: hidden;
+    }
     &--settings {
       margin: .625em;
       border-radius: 5px;
@@ -87,8 +94,11 @@ $colors: #9e080840, #80089e40, #081b9e40, #089e9040, #0b9e0840, #9e990840, #9e4d
   height: fit-content;
   border-radius: 10px;
   &__header {
+    color: white;
+    &[disabled] {
+      color: rgb(154, 153, 153);
+    }
     &--name {
-      color: white;
       font-size: 20px;
       font-weight: bold;
       max-width: 40vw;

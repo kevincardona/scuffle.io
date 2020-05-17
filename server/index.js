@@ -50,7 +50,7 @@ function leaveRoom() {
 }
 
 function joinRoom(data) {
-  game.addPlayer(this, data.nickname, data.room);
+  game.addPlayer(this, data.nickname, data.room, data.isPrivate);
 }
 
 function handlePlayerMessage(message) {

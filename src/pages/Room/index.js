@@ -24,9 +24,9 @@ export default class Room extends Component {
   }
 
   connect = () => {
-    const {room, nickname} = this.props
+    const {room, nickname, isPrivate} = this.props
     const socket = getSocket()
-    joinRoom(socket, room, nickname)
+    joinRoom(socket, room, nickname, isPrivate)
     socket.on(Constants.MSG_TYPES.GAME_UPDATE, this.updateRoom)
     this.setState({ 
       socket: socket, 

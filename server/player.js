@@ -10,6 +10,8 @@ class Player {
     this.room = room
     this.words = []
     this.score = 0
+    this.active = true
+    this.isDone = false
   }
 
   getPlayerData() {
@@ -17,7 +19,8 @@ class Player {
       nickname: this.nickname,
       playerId: this.id,
       words: this.words,
-      score: this.score
+      score: this.score,
+      active: this.active,
     }
   }
 

@@ -28,6 +28,7 @@ module.exports = Object.freeze({
   },
   GAME: {
     TILE_COUNT: 150,
+    TURN_TIMEOUT: 20000,
     LETTER_DISTRIBUTION: {
       A: 14,
       B: 5,

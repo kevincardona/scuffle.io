@@ -8,8 +8,8 @@ import './menu.scss'
 const Menu = (props) => {
   const [room, setRoom] = useState('');
   const [nickname, setNickname] = useState('')
-  const [isPrivate, setIsPrivate] = useState(true)
   const [disabled, setDisabled] = useState(false)
+  const [isPrivate, setPrivate] = useState(true)
   const [isPlaying, setIsPlaying] = useState(false)
   const [playerCount, setPlayerCount] = useState(0);
 
@@ -24,21 +24,20 @@ const Menu = (props) => {
   }, [props])
 
   const downHandler = ({ key }) => {
-    if (key === 'Enter' && nickname && (isPrivate || room !== null)) {
-      setIsPlaying(true);
+    if (key === 'Enter' && nickname) {
+      startGame()
     }
+  }
+
+  const startGame = (isPrivate = false) => {
+    setPrivate(isPrivate);
+    setIsPlaying(true);
   }
 
   window.addEventListener('keydown', downHandler)
 
-  const togglePrivate = () => {
-    setIsPrivate(!isPrivate); 
-    if (isPrivate) 
-      setRoom(null)
-  }
-
   if (isPlaying)
-    return <Room room={room} nickname={nickname}/>
+    return <Room nickname={nickname} isPrivate={isPrivate}/>
   return (
     <div id="play-menu">
       <div className="title">
@@ -55,44 +54,25 @@ const Menu = (props) => {
         onChange={e => setNickname(e.target.value)} 
         maxLength="15"
       />
-      { !disabled &&
-        <Fragment>
-          <div className="play-menu__checkbox">
-            <label className="play-menu__checkbox--label">
-              Private Room?
-            </label>
-            <input
-              type="checkbox"
-              autoComplete="off"
-              value={isPrivate}
-              onClick={togglePrivate}
-              defaultChecked
-            />
-          </div>
-        </Fragment>
-      }
-      { !disabled && !isPrivate &&
-        <input 
-          type="text" 
-          className="input-group-text mb-2" 
-          id="room-input" 
-          placeholder="Room Name" 
-          value={room || ''} 
-          disabled={disabled}
-          onChange={e => setRoom(e.target.value)} 
-          maxLength="15"
-        />
+      {
+      /*
+      <button type="button" className="btn btn-success btn-sm menu-button" disabled={!nickname} onClick={()=>{startGame(true)}}>
+        PRIVATE GAME
+      </button>
+      */
       }
       <div id="menu-buttons">
-        <span className="button--link" onClick={()=>setIsPlaying(true)}>
-          <button type="button" className="btn btn-primary menu-button" disabled={!((isPrivate || room) && nickname)}>
-            { disabled ? "JOIN GAME" : "PLAY" }
+        <span className="button--link" onClick={startGame}>
+          <button type="button" className="btn btn-primary menu-button" disabled={!nickname}>
+            { disabled ? "JOIN GAME" : "START" }
           </button>
         </span>
         { !disabled &&
-          <Link className="button--link" to={`/about`}>
-            <button type="button" className="btn btn-secondary menu-button">RULES</button>
-          </Link>
+          <Fragment>
+            <Link className="button--link" to={`/about`}>
+              <button type="button" className="btn btn-secondary menu-button">RULES</button>
+            </Link>
+          </Fragment>
         }
       </div>
     </div>

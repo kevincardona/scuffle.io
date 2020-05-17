@@ -9,6 +9,7 @@ class Game {
     this.io = io
     this.players = {};
     this.rooms = {};
+    this.publicRooms = []
     this.lastUpdateTime = Date.now();
     this.shouldSendUpdate = false;
   }
@@ -28,6 +29,10 @@ class Game {
       return this.createPrivateRoom()
     this.rooms[room] = new Room(this.io, room, true);
     return room
+  }
+
+  getPublicRoom() {
+
   }
 
   handlePlayerMessage(socket, message) {
@@ -51,9 +56,13 @@ class Game {
     this.getPlayerRoom(socket).handlePlayerCommand(data, action.command, action.args)
   }
 
-  addPlayer(socket, nickname, room) {
+  addPlayer(socket, nickname, room, isPrivate = false) {
     logger.info(`Player ${nickname} has joined room ${room} with socket id: ${socket.id}`)
-    if (!room) { room = this.createPrivateRoom() }
+    if (isPrivate) { 
+      room = this.createPrivateRoom() 
+    } else {
+      room = this.getPublicRoom()
+    }
     if (this.players[socket.id])
       return this.rooms[room].addPlayer(socket, nickname)
     if (this.rooms[room]) {
@@ -75,7 +84,7 @@ class Game {
     if (room) {
       room.removePlayer(socket)
       socket.leave(room.id, () => {
-        if (room.playerCount === 0) {
+        if (room.isEmpty()) {
           logger.info(`No players left in room:${room.id}. Deleting...`)
           this.rooms[room.id] = null
           room.destroy()
