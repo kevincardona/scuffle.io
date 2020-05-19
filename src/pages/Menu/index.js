@@ -6,10 +6,9 @@ import Room from '../Room';
 import './menu.scss'
  
 const Menu = (props) => {
-  const [room, setRoom] = useState('');
   const [nickname, setNickname] = useState('')
   const [disabled, setDisabled] = useState(false)
-  const [isPrivate, setPrivate] = useState(true)
+  const [isPrivate, setPrivate] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
   const [playerCount, setPlayerCount] = useState(0);
 
@@ -19,13 +18,12 @@ const Menu = (props) => {
         setPlayerCount(res.playerCount)
     })
     const params = queryString.parse(props.location.search)
-    setRoom(params.room);
     setDisabled(params.room != null)
   }, [props])
 
   const downHandler = ({ key }) => {
     if (key === 'Enter' && nickname) {
-      startGame()
+      startGame(false)
     }
   }
 
@@ -54,17 +52,14 @@ const Menu = (props) => {
         onChange={e => setNickname(e.target.value)} 
         maxLength="15"
       />
-      {
-      /*
-      <button type="button" className="btn btn-success btn-sm menu-button" disabled={!nickname} onClick={()=>{startGame(true)}}>
-        PRIVATE GAME
-      </button>
-      */
-      }
       <div id="menu-buttons">
-        <span className="button--link" onClick={startGame}>
+        <button type="button" className="btn btn-success btn-sm menu-button" disabled={!nickname} onClick={()=>{startGame(true)}}>
+          PRIVATE ROOM
+        </button>
+        <br/>
+        <span className="button--link" onClick={()=>startGame(false)}>
           <button type="button" className="btn btn-primary menu-button" disabled={!nickname}>
-            { disabled ? "JOIN GAME" : "START" }
+            { disabled ? "JOIN GAME" : "PLAY" }
           </button>
         </span>
         { !disabled &&

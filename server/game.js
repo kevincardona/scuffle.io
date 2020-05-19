@@ -32,7 +32,15 @@ class Game {
   }
 
   getPublicRoom() {
-
+    for (let i = 0; i < this.publicRooms.length; i++) {
+      if (this.rooms[this.publicRooms[i]] && this.rooms[this.publicRooms[i]].activePlayerCount() < 6) {
+        return this.publicRooms[i];
+      }
+    }
+    let roomId = crypto.randomBytes(20).toString('hex');
+    this.rooms[roomId] = new Room(this.io, roomId, false);
+    this.publicRooms.push(roomId);
+    return roomId
   }
 
   handlePlayerMessage(socket, message) {
@@ -86,6 +94,7 @@ class Game {
       socket.leave(room.id, () => {
         if (room.isEmpty()) {
           logger.info(`No players left in room:${room.id}. Deleting...`)
+          this.publicRooms.splice(this.publicRooms.indexOf(room.id), 1)
           this.rooms[room.id] = null
           room.destroy()
           delete this.rooms[room.id]

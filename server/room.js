@@ -96,14 +96,14 @@ class Room {
         this.nextPlayer()
       }, Constants.GAME.TURN_TIMEOUT)
     }
-    if (!this.getCurrentPlayer().active)
+    if (!this.getCurrentPlayer().active && this.activePlayerCount() > 0)
       return this.nextPlayer();
   }
 
   getRoomData() {
     const players = Object.keys(this.players).map((player) =>this.players[player].getPlayerData())
     const data = {
-      roomName: this.privateRoom ? "Private Game" : this.id,
+      roomName: this.privateRoom ? "Private Game" : "Public Game",
       roomId: this.id,
       unflippedCount: this.unflipped.length,
       flipped: this.flipped,
