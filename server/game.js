@@ -14,35 +14,6 @@ class Game {
     this.shouldSendUpdate = false;
   }
 
-  getPlayerCount() {
-    return Object.keys(this.players).length
-  }
-
-  getPlayerRoom(socket) {
-    if (this.players[socket.id])
-      return this.rooms[this.players[socket.id].room]
-  }
-
-  createPrivateRoom() {
-    let room = crypto.randomBytes(20).toString('hex');
-    if (this.rooms[room])
-      return this.createPrivateRoom()
-    this.rooms[room] = new Room(this.io, room, true);
-    return room
-  }
-
-  getPublicRoom() {
-    for (let i = 0; i < this.publicRooms.length; i++) {
-      if (this.rooms[this.publicRooms[i]] && this.rooms[this.publicRooms[i]].activePlayerCount() < 6) {
-        return this.publicRooms[i];
-      }
-    }
-    let roomId = crypto.randomBytes(20).toString('hex');
-    this.rooms[roomId] = new Room(this.io, roomId, false);
-    this.publicRooms.push(roomId);
-    return roomId
-  }
-
   handlePlayerMessage(socket, message) {
     if (!this.players[socket.id]) return logger.error(`Unable to handle unregistered player action with socket id: ${socket.id}`)
     const data = {
@@ -64,21 +35,54 @@ class Game {
     this.getPlayerRoom(socket).handlePlayerCommand(data, action.command, action.args)
   }
 
+  getPlayerCount() {
+    return Object.keys(this.players).length
+  }
+
+  getPlayerRoom(socket) {
+    if (this.players[socket.id])
+      return this.rooms[this.players[socket.id].room]
+  }
+
+  getPrivateRoom(roomId) {
+    if (roomId)
+      return this.rooms[roomId] !== undefined && roomId
+    let room = crypto.randomBytes(20).toString('hex');
+    if (this.rooms[room])
+      return this.getPrivateRoom()
+    this.rooms[room] = new Room(this.io, room, true);
+    return room
+  }
+
+  getPublicRoom(roomId) {
+    if (this.rooms[roomId] !== undefined)
+      return roomId
+    for (let i = 0; i < this.publicRooms.length; i++) {
+      if (this.rooms[this.publicRooms[i]] && this.rooms[this.publicRooms[i]].activePlayerCount() < 6) {
+        return this.publicRooms[i];
+      }
+    }
+    let room = crypto.randomBytes(20).toString('hex');
+    this.rooms[room] = new Room(this.io, room, false);
+    this.publicRooms.push(room);
+    return room
+  }
+
   addPlayer(socket, nickname, room, isPrivate = false) {
     logger.info(`Player ${nickname} has joined room ${room} with socket id: ${socket.id}`)
-    if (isPrivate) { 
-      room = this.createPrivateRoom() 
-    } else {
-      room = this.getPublicRoom()
-    }
+    if (isPrivate) 
+      room = this.getPrivateRoom(room) 
+    else
+      room = this.getPublicRoom(room)
+
     if (this.players[socket.id])
       return this.rooms[room].addPlayer(socket, nickname)
-    if (this.rooms[room]) {
+
+    if (this.rooms[room])
       this.rooms[room].addPlayer(socket, nickname)
-    } else {
-      this.rooms[room] = new Room(this.io, room)
-      this.rooms[room].addPlayer(socket, nickname, room)
-    }
+    else
+      return socket.emit(Constants.MSG_TYPES.ERROR, {message: "This game is no longer active!", exit: true}) 
+
     socket.join(room)
     this.players[socket.id] = {
       nickname: nickname,

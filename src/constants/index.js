@@ -7,9 +7,12 @@ module.exports = Object.freeze({
     STEAL_WORD: 'STEAL_WORD',
     RESET: 'RESET',
     DONE: 'DONE',
-    RULES: 'RULES'
+    RULES: 'RULES',
+    PAUSE_GAME: 'PAUSE_GAME',
+    UNPAUSE_GAME: 'UNPAUSE_GAME'
   },
   MSG_TYPES: {
+    ERROR: 'ERROR',
     CREATE_ROOM: 'create_room',
     JOIN_ROOM: 'join_room',
     LEAVE_ROOM: 'leave_room',
@@ -29,6 +32,7 @@ module.exports = Object.freeze({
   GAME: {
     TILE_COUNT: 150,
     TURN_TIMEOUT: 15000,
+    PAUSED_TIMEOUT: 15000,
     LETTER_DISTRIBUTION: {
       A: 14,
       B: 5,

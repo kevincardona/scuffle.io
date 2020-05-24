@@ -7,6 +7,7 @@ import './menu.scss'
  
 const Menu = (props) => {
   const [nickname, setNickname] = useState('')
+  const [room, setRoom] = useState('');
   const [disabled, setDisabled] = useState(false)
   const [isPrivate, setPrivate] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
@@ -18,24 +19,25 @@ const Menu = (props) => {
         setPlayerCount(res.playerCount)
     })
     const params = queryString.parse(props.location.search)
-    setDisabled(params.room != null)
+    setDisabled(params.room || params.proom)
+    setPrivate(params.proom !== undefined)
+    setRoom(params.room || params.proom);
   }, [props])
 
   const downHandler = ({ key }) => {
     if (key === 'Enter' && nickname) {
-      startGame(false)
+      startGame()
     }
   }
 
-  const startGame = (isPrivate = false) => {
-    setPrivate(isPrivate);
+  const startGame = () => {
     setIsPlaying(true);
   }
 
   window.addEventListener('keydown', downHandler)
 
   if (isPlaying)
-    return <Room nickname={nickname} isPrivate={isPrivate}/>
+    return <Room room={room} nickname={nickname} isPrivate={isPrivate}/>
   return (
     <div id="play-menu">
       <div className="title">
@@ -53,11 +55,15 @@ const Menu = (props) => {
         maxLength="15"
       />
       <div id="menu-buttons">
-        <button type="button" className="btn btn-success btn-sm menu-button" disabled={!nickname} onClick={()=>{startGame(true)}}>
-          PRIVATE ROOM
-        </button>
-        <br/>
-        <span className="button--link" onClick={()=>startGame(false)}>
+        { !disabled &&
+          <Fragment>
+            <button type="button" className="btn btn-success btn-sm menu-button" disabled={!nickname} onClick={()=>{setPrivate(true); startGame()}}>
+              PRIVATE ROOM
+            </button>
+            <br/>
+          </Fragment>
+        }
+        <span className="button--link" onClick={()=>startGame()}>
           <button type="button" className="btn btn-primary menu-button" disabled={!nickname}>
             { disabled ? "JOIN GAME" : "PLAY" }
           </button>

@@ -16,8 +16,11 @@ class Room {
     this.currentPlayer = 0
     this.flipped = new Array(Constants.GAME.TILE_COUNT)
     this.currentPlayer = null;
+    this.pausedPlayer = null;
+    this.paused = false;
     this.io = io
     this.turnTimeout = null
+    this.pausedTimeout = null
     this.updateInterval = setInterval(this.update.bind(this), 2000);
     this.generateTable()
   }
@@ -88,6 +91,8 @@ class Room {
 
   nextPlayer() {
     clearTimeout(this.turnTimeout)
+    if (this.activePlayerCount() === 1)
+      return
     this.currentPlayer = (this.currentPlayer + 1) % this.playerOrder.length
     if (this.unflipped.length !== 0) {
       this.sendRoomMessage(`${this.getCurrentPlayer().nickname}'s turn!`)
@@ -101,14 +106,17 @@ class Room {
   }
 
   getRoomData() {
-    const players = Object.keys(this.players).map((player) =>this.players[player].getPlayerData())
+    const players = Object.keys(this.players).map((player) => this.players[player].getPlayerData())
     const data = {
       roomName: this.privateRoom ? "Private Game" : "Public Game",
       roomId: this.id,
       unflippedCount: this.unflipped.length,
       flipped: this.flipped,
       players: players,
-      currentPlayer: this.getCurrentPlayerId()
+      currentPlayer: this.getCurrentPlayerId(),
+      privateRoom: this.privateRoom,
+      pausedPlayer: this.pausedPlayer,
+      paused: this.paused
     }
     
     return data;
@@ -268,6 +276,28 @@ class Room {
     this.resetGame()
   }
 
+  unpauseGame(playerId) {
+    if (playerId !== this.pausedPlayer) return
+    this.pausedPlayer = null;
+    this.paused = false;
+    if (this.pausedTimeout)
+      clearTimeout(this.pausedTimeout)
+  }
+
+  pauseGame(playerId) {
+    if (this.paused) return
+    this.paused = true
+    this.pausedPlayer = playerId
+    this.pausedTimeout = setTimeout(()=>{
+      this.pausedPlayer = null;
+      this.paused = false;
+    }, Constants.GAME.PAUSED_TIMEOUT)
+  }
+
+  hasMove(playerId) {
+    return playerId === this.pausedPlayer
+  }
+
   handlePlayerCommand(data, command, args) {
     switch(command) {
       case Constants.COMMANDS.FLIP:
@@ -275,10 +305,11 @@ class Room {
           this.flipTile(data); 
         break;
       case Constants.COMMANDS.CREATE_WORD:
+        if (!this.hasMove(data.playerId)) break;
         this.createWord(data, args[0]); 
         break;
       case Constants.COMMANDS.STEAL_WORD:
-        if (!args[0]) break;
+        if (!args[0] || !this.hasMove(data.playerId)) break;
         this.stealWord(data, args[0].playerId, args[0].word, args[1]); 
         break;
       case Constants.COMMANDS.RETURN:
@@ -302,9 +333,14 @@ class Room {
       case Constants.COMMANDS.RULES:
         this.sendPrivateMessage(this.getSocket(data.playerId), Constants.SERVER_PROMPTS.RULES);
         break;
+      case Constants.COMMANDS.PAUSE_GAME:
+        this.pauseGame(data.playerId)
+        break;
+      case Constants.COMMANDS.UNPAUSE_GAME:
+        this.unpauseGame(data.playerId)
+        break;
       default:
         this.sendPrivateMessage(this.getSocket(data.playerId), `Command not found!`);
-        break;
     }
     this.update();
   }

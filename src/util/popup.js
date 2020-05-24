@@ -19,14 +19,51 @@ const popup = (type, data = {}) => {
       stealPopup(data)
       break;
     case 'win':
-      winNotification(data);
+      winPopup(data);
+      break;
+    case 'error':
+      errorPopup(data);
+      break;
+    case 'pause':
+      pausePopup(data);
+      break;
+    case 'close':
+      RSwal.close();
       break;
     default:
   }
 } 
 
-const winNotification = (data) => {
+const winPopup = (data) => {
 
+}
+
+const pausePopup = (data) => {
+  return RSwal.fire({
+    title: 'PAUSED',
+    html:
+    <div>
+      {data.message}
+    </div>,
+    showCloseButton: false,
+    allowOutsideClick: false,
+    showConfirmButton: false,
+    showCancelButton: false
+  })
+}
+
+const errorPopup = (data) => {
+  RSwal.fire({
+    title: 'ERROR',
+    html:
+    <div>
+      {data.message}
+    </div>,
+    confirmButtonText: 'OK',
+    showCloseButton: !data.exit
+  }).then(() => {
+    data.close();
+  })
 }
 
 const stealPopup = (data) => {
@@ -39,6 +76,7 @@ const stealPopup = (data) => {
     if (result.value) {
       data.submit(result.value);
     }
+    data.close();
   })
 }
 
@@ -52,6 +90,7 @@ const createPopup = (data) => {
     if (result.value) {
       data.submit(result.value);
     }
+    data.close();
   })
 }
 
