@@ -1,10 +1,16 @@
 # SCUFFLE
 [![Heroku](http://heroku-badge.herokuapp.com/?app=angularjs-crypto&style=flat&svg=1)]
 
+##### Play Now! 
+https://scuffle.online
+
 ##### About
-This is a <b>WIP</b> game that I am working on to play with my family during self isolation. (My families version of "Bananagrams")
+This is a <b>WIP</b> multiplayer game that I am making to play with my family from across the country. (My families version of Bananagrams)
+
+Recommended 3-5 Players
 
 ## RULES
+
 Object: Be the player with the most letters by the end of the game
 
 This game starts with 144 letter tiles facedown in the center.
