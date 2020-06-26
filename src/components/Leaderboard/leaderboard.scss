@@ -1,7 +1,6 @@
 #leaderboard {
   width: 100%;
   height: 100%;
-  padding: 3px;
   background-color: #424344;
   color: white;
   text-align: center;
@@ -62,9 +61,6 @@
   }
 
   &__players {
-    overflow-y: auto;
-    height: 100%;
-    display: flex;
     &--header {
       margin: 0;
     }
@@ -93,6 +89,8 @@ $colors: #9e080840, #80089e40, #081b9e40, #089e9040, #0b9e0840, #9e990840, #9e4d
   margin-bottom: 0.2em;
   height: fit-content;
   border-radius: 10px;
+  box-shadow: 0px 1px 2px 0px rgba(61, 61, 61, 0.5);
+
   &__header {
     color: white;
     &[disabled] {
@@ -131,16 +129,20 @@ $colors: #9e080840, #80089e40, #081b9e40, #089e9040, #0b9e0840, #9e990840, #9e4d
 
 @media screen and (max-width: 500px) {
   #leaderboard {
-    overflow-y: auto;
+    height: 75vh;
+    min-height: 150px;
   }
 
   .leaderboard {
     &__header {
-      min-height: 0;
+      h2 {
+        font-size: 1.5rem;
+      }
     }
     &__players {
-      &--words {
-        height: 60vh;
+      height: 50vh;
+      &--words{
+        height: 50vh;
       }
     }
   }

@@ -8,21 +8,21 @@ const logger = loggers.get('main-logger');
 class Room {
   constructor(io, id, privateRoom=false) {
     this.id = id;
-    this.privateRoom = privateRoom
+    this.privateRoom = privateRoom;
     this.playerCount = 0
     this.players = {}
     this.playerOrder = []
     this.overrides = {}
     this.currentPlayer = 0
-    this.flipped = new Array(Constants.GAME.TILE_COUNT)
+    this.flipped = new Array(Constants.GAME.TILE_COUNT);
     this.currentPlayer = null;
     this.pausedPlayer = null;
     this.paused = false;
-    this.io = io
-    this.turnTimeout = null
-    this.pausedTimeout = null
+    this.io = io;
+    this.turnTimeout = null;
+    this.pausedTimeout = null;
     this.updateInterval = setInterval(this.update.bind(this), 2000);
-    this.generateTable()
+    this.generateTable();
   }
 
   isEmpty() {
@@ -378,7 +378,7 @@ class Room {
   }
 
   addPlayer(socket, nickname) {
-    logger.debug(`Adding player ${nickname} to room ${this.id}`)
+    logger.info(`Adding player ${nickname} to room ${this.id}`)
     this.players[socket.id] = new Player(socket, nickname, this.id)
     this.playerOrder.push(socket.id);
     this.playerCount = this.playerCount + 1
