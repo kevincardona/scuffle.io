@@ -1,5 +1,5 @@
 # SCUFFLE
-[![Heroku](http://heroku-badge.herokuapp.com/?app=angularjs-crypto&style=flat&svg=1)]
+<img src="http://heroku-badge.herokuapp.com/?app=angularjs-crypto&style=flat&svg=1" alt="">
 
 ##### Play Now! 
 https://scuffle.online
