@@ -1,13 +1,14 @@
-# SCUFFLE
-<img src="http://heroku-badge.herokuapp.com/?app=angularjs-crypto&style=flat&svg=1" alt="">
+# [SCUFFLE](https://scuffle.online)
 
-##### Play Now! 
-https://scuffle.online
+<img src="http://heroku-badge.herokuapp.com/?app=angularjs-crypto&style=flat&svg=1" alt=""/>
 
 ##### About
 This is a <b>WIP</b> multiplayer game that I am making to play with my family from across the country. (My families version of Bananagrams)
 
 Recommended 3-5 Players
+
+### Play Now!
+[scuffle.online](https://scuffle.online)
 
 ## RULES
 
