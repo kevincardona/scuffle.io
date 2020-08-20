@@ -28,6 +28,7 @@
     "client": "nodemon server/index.js",
     "dev": "concurrently \"react-scripts start\" \"yarn run client\"",
     "start": "node server/index.js",
+    "lint": "eslint --fix --ignore-path .gitignore .",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",

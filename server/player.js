@@ -1,7 +1,3 @@
-const Constants = require('../src/constants');
-const { loggers } = require('winston');
-const logger = loggers.get('main-logger');
-
 class Player {
   constructor(socket, nickname, room) {
     this.id = socket.id

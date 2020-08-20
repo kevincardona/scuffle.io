@@ -1,6 +1,4 @@
-import { Component } from 'react'
-
-if (localStorage.getItem('soundEnabled') == undefined) {
+if (localStorage.getItem('soundEnabled') === undefined) {
   localStorage.setItem('soundEnabled', true)
 }
 let soundEnabled = localStorage.getItem('soundEnabled')

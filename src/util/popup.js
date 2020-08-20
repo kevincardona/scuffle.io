@@ -100,7 +100,7 @@ const invitePopup = (data) => {
     title: 'Inviting a Friend',
     html:
       <div>
-        To invite a friend send them this link:
+        To invite friends send them this link:
         <input disabled value={data.link}/>
       </div>,
     confirmButtonText: 'Copy',
