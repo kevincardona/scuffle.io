@@ -1,35 +1,34 @@
 import React from 'react';
-import {Link} from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import logo from '../../assets/logo.svg';
 import './home.scss';
 
 const Home = () => {
   return (
     <div id="home">
-        <img id="title" src={logo} alt="Scuffle" />
-        <Link to={`/play`}>
-          <button type="button" className="btn btn-primary mb-5">PLAY</button>
-        </Link>
-        <div id="how-to-play">
-          <h5>HOW TO PLAY</h5>
-          <p>
-            Be the player with the most letters by the end of the game
-          </p>
-          <p>This game starts with 144 letter tiles facedown in the center.</p>
-          <p>
-            Each player takes turns flipping 1 letter at a time in the center. Whenever any player sees a word that can be made of <b>3 or more</b> flipped letters they must call it out and collect their word. At any time the player can transform their word into a longer (and different) one given they use all of the letters AND at least one from the center              
-          </p>
-          <h5>STEALING WORDS</h5>
-          <p>
-            A word can be stolen from another player <b>at any time</b> provided that word can be turned into a different word using <b>ALL</b> of the letters <b>+ at least 1</b> letter from the center
-          </p>
-          <h5>WINNING</h5>
-          <p>
-            When all of the letters from the center have been flipped and nobody has any steals/words to create using the center letters then the game is over. The player with the most letters wins the game.
-          </p>
-        </div>
+      <img id="title" src={logo} alt="Scuffle" />
+      <Link to="/play">
+        <button type="button" className="btn btn-primary mb-5">PLAY</button>
+      </Link>
+      <div id="how-to-play">
+        <h5>How to Play</h5>
+        <p>Aim to collect the most letters by the end of the game.</p>
+        <p>The game begins automatically with 144 letter tiles facedown at the center.</p>
+        <p>
+          Players take turns flipping one letter at a time. Form words by calling out any that can be made from <strong>three or more</strong> flipped letters. You may also extend your words using all their letters plus at least one new letter from the center, forming a longer and different word.
+        </p>
+        <h5>Stealing Words</h5>
+        <p>
+          Steal a word from another player by transforming it into a different word using all the original letters <strong>plus at least one</strong> from the center.
+        </p>
+        <h5>Winning the Game</h5>
+        <p>
+          The game ends when all letters from the center are flipped, and no further words or steals can be made. The player with the most letters wins.
+        </p>
+      </div>
     </div>
-  )
+  );
 }
 
-export default Home
+export default Home;
+
